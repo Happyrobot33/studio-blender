@@ -4,7 +4,8 @@ from bpy.types import Operator
 from sbstudio.plugin.constants import NUM_PYRO_CHANNELS
 from sbstudio.model.pyro_markers import PyroMarker, PyroPayload
 from sbstudio.plugin.selection import get_selected_drones
-from sbstudio.plugin.utils.pyro_markers import add_pyro_marker_to_object
+from sbstudio.plugin.utils.pyro_markers import add_pyro_marker_to_object, get_pyro_markers_of_object
+from sbstudio.plugin.constants import Collections
 
 __all__ = ("TriggerPyroOnSelectedDronesOperator",)
 
@@ -107,7 +108,7 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
         for drone in selection:
             self._trigger_pyro_on_single_drone(drone, frame)
         
-        #self._recalculate_pyro_markers(context)
+        self._recalculate_pyro_markers(context)
 
         return True
 
@@ -128,7 +129,7 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
             ),
         )
     
-"""     def _recalculate_pyro_markers(self, context):
+    def _recalculate_pyro_markers(self, context):
         #get all the pyro triggers
         scene = context.scene
 
@@ -139,7 +140,8 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
 
         drones = Collections.find_drones(create=False)
 
-        for drone in drones:
+        for drone in drones.objects:
             markers = get_pyro_markers_of_object(drone)
-            for channel, marker in markers.markers.items():
-                m = scene.timeline_markers.new(name=f"Pyro {channel}", frame=marker.frame) """
+            for frame in markers.markers:
+                channel = markers.markers[frame].channel
+                m = scene.timeline_markers.new(name=f"Pyro {channel}", frame=frame)
