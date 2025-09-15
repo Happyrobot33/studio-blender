@@ -96,6 +96,30 @@ class PyroControlPanelProperties(PropertyGroup):
 
     # TODO: add yaw and pitch angle relative to the drone, if needed
 
+    pitch = IntProperty(
+        name="Pitch",
+        description="The pitch angle of the pyro effect",
+        default=0,
+        min=-90,
+        max=90
+    )
+
+    yaw = IntProperty(
+        name="Yaw",
+        description="The yaw angle of the pyro effect",
+        default=0,
+        min=-180,
+        max=180
+    )
+
+    roll = IntProperty(
+        name="Roll",
+        description="The roll angle of the pyro effect",
+        default=0,
+        min=-180,
+        max=180
+    )
+
     def clear_pyro_overlay_markers(self) -> None:
         """Clears the pyro overlay markers."""
         self.ensure_overlays_enabled_if_needed()

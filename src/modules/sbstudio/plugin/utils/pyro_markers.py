@@ -21,7 +21,7 @@ __all__ = (
 )
 
 
-def add_pyro_marker_to_object(ob: Object, channel: int, marker: PyroMarker) -> None:
+def add_pyro_marker_to_object(ob: Object, frame: int, marker: PyroMarker) -> None:
     """Add a pyro marker to the Skybrush context of an object.
 
     Args:
@@ -30,7 +30,7 @@ def add_pyro_marker_to_object(ob: Object, channel: int, marker: PyroMarker) -> N
         marker: the marker to add
     """
     markers = get_pyro_markers_of_object(ob)
-    markers.markers[int(channel)] = marker
+    markers.markers[int(frame)] = marker
     set_pyro_markers_of_object(ob, markers)
 
 

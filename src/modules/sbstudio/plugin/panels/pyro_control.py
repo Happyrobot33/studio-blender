@@ -45,4 +45,10 @@ class PyroControlPanel(Panel):
 
         layout.separator()
 
+        layout.prop(pyro_control, "pitch")
+        layout.prop(pyro_control, "yaw")
+        layout.prop(pyro_control, "roll")
+
+        layout.separator()
+
         layout.operator(TriggerPyro.bl_idname, text="Trigger")

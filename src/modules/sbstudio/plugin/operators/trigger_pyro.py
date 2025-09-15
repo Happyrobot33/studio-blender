@@ -50,6 +50,30 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
         step=100,  # button step is 1/100th of step
     )
 
+    pitch = IntProperty(
+        name="Pitch",
+        description="The pitch angle of the pyro effect",
+        default=0,
+        min=-90,
+        max=90
+    )
+
+    yaw = IntProperty(
+        name="Yaw",
+        description="The yaw angle of the pyro effect",
+        default=0,
+        min=-180,
+        max=180
+    )
+
+    roll = IntProperty(
+        name="Roll",
+        description="The roll angle of the pyro effect",
+        default=0,
+        min=-180,
+        max=180
+    )
+
     def execute(self, context):
         # This code path is invoked after an undo-redo
         return {"FINISHED"} if self._run(context) else {"CANCELLED"}
@@ -82,19 +106,40 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
         frame = context.scene.frame_current
         for drone in selection:
             self._trigger_pyro_on_single_drone(drone, frame)
+        
+        #self._recalculate_pyro_markers(context)
 
         return True
 
     def _trigger_pyro_on_single_drone(self, drone, frame: int):
         add_pyro_marker_to_object(
             drone,
-            channel=self.channel,
+            frame=frame,
             marker=PyroMarker(
-                frame=frame,
+                channel=self.channel,
                 payload=PyroPayload(
                     name=self.name,
                     duration=self.duration,
                     prefire_time=self.prefire_time,
                 ),
+                pitch=self.pitch,
+                yaw=self.yaw,
+                roll=self.roll
             ),
         )
+    
+"""     def _recalculate_pyro_markers(self, context):
+        #get all the pyro triggers
+        scene = context.scene
+
+        markers = scene.timeline_markers
+        for m in markers:
+            if m.name.startswith("Pyro"):
+                markers.remove(m)
+
+        drones = Collections.find_drones(create=False)
+
+        for drone in drones:
+            markers = get_pyro_markers_of_object(drone)
+            for channel, marker in markers.markers.items():
+                m = scene.timeline_markers.new(name=f"Pyro {channel}", frame=marker.frame) """

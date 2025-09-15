@@ -26,7 +26,7 @@ class PyroPayload:
         return {
             "name": self.name,
             "duration": self.duration,
-            "prefireTime": self.prefire_time,
+            "prefireTime": self.prefire_time
         }
 
 
@@ -37,8 +37,12 @@ class PyroMarker:
 
     So far we assume that one channel can be used only once for pyro triggering."""
 
-    frame: int
+    channel: int
     """The frame number of the trigger event."""
+
+    pitch: int
+    yaw: int
+    roll: int
 
     payload: PyroPayload
     """Properties of the pyro payload attached."""
@@ -48,11 +52,15 @@ class PyroMarker:
         payload = data.get("payload")
         if payload is None:
             raise ValueError("payload field is missing")
-        frame = data.get("frame")
-        if frame is None:
-            raise ValueError("frame field is missing")
+        channel = data.get("channel")
+        if channel is None:
+            raise ValueError("channel field is missing")
+        
+        pitch = data.get("pitch", 0)
+        yaw = data.get("yaw", 0)
+        roll = data.get("roll", 0)
 
-        return cls(payload=PyroPayload(**payload), frame=int(frame))
+        return cls(payload=PyroPayload(**payload), channel=int(channel), pitch=int(pitch), yaw=int(yaw), roll=int(roll))
 
     def is_active_at_frame(self, frame: int, fps: float) -> bool:
         """Returns whether the pyro is active at the given frame"""
