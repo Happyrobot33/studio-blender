@@ -18,6 +18,7 @@ __all__ = (
     "remove_pyro_particle_system",
     "set_pyro_markers_of_object",
     "update_pyro_particles_of_object",
+    "remove_pyro_marker_from_object",
 )
 
 
@@ -33,6 +34,17 @@ def add_pyro_marker_to_object(ob: Object, frame: int, marker: PyroMarker) -> Non
     markers.markers[int(frame)] = marker
     set_pyro_markers_of_object(ob, markers)
 
+def remove_pyro_marker_from_object(ob: Object, frame: int) -> None:
+    """Remove a pyro marker from the Skybrush context of an object.
+
+    Args:
+        object: the object to remove the pyro marker from
+        frame: the frame to remove the marker on
+    """
+    markers = get_pyro_markers_of_object(ob)
+    if frame in markers.markers:
+        del markers.markers[frame]
+    set_pyro_markers_of_object(ob, markers)
 
 def get_pyro_markers_of_object(ob: Object) -> PyroMarkers:
     """Get pyro markers from the Skybrush context of an object.

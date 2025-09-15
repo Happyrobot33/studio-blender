@@ -2,6 +2,8 @@ from bpy.types import Panel
 
 from sbstudio.plugin.operators import (
     TriggerPyroOnSelectedDronesOperator as TriggerPyro,
+    RemovePyroOnSelectedDronesOperator as RemovePyro,
+    CalculatePyroMarkers as CalculatePyroMarkers,
 )
 
 
@@ -52,3 +54,5 @@ class PyroControlPanel(Panel):
         layout.separator()
 
         layout.operator(TriggerPyro.bl_idname, text="Trigger")
+        layout.operator(RemovePyro.bl_idname, text="Remove on this frame")
+        layout.operator(CalculatePyroMarkers.bl_idname, text="Recalculate Markers")

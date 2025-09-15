@@ -108,7 +108,8 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
         for drone in selection:
             self._trigger_pyro_on_single_drone(drone, frame)
         
-        self._recalculate_pyro_markers(context)
+        from sbstudio.plugin.operators import CalculatePyroMarkers
+        CalculatePyroMarkers._recalculate_pyro_markers(context)
 
         return True
 
@@ -128,20 +129,3 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
                 roll=self.roll
             ),
         )
-    
-    def _recalculate_pyro_markers(self, context):
-        #get all the pyro triggers
-        scene = context.scene
-
-        markers = scene.timeline_markers
-        for m in markers:
-            if m.name.startswith("Pyro"):
-                markers.remove(m)
-
-        drones = Collections.find_drones(create=False)
-
-        for drone in drones.objects:
-            markers = get_pyro_markers_of_object(drone)
-            for frame in markers.markers:
-                channel = markers.markers[frame].channel
-                m = scene.timeline_markers.new(name=f"Pyro {channel}, {drone.name}", frame=frame)
