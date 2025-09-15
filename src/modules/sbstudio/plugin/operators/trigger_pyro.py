@@ -144,4 +144,4 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
             markers = get_pyro_markers_of_object(drone)
             for frame in markers.markers:
                 channel = markers.markers[frame].channel
-                m = scene.timeline_markers.new(name=f"Pyro {channel}", frame=frame)
+                m = scene.timeline_markers.new(name=f"Pyro {channel}, {drone.name}", frame=frame)
