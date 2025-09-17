@@ -116,12 +116,12 @@ class PyroMarkers:
         keys = sorted(self.markers.keys())
         events = [
             #frame is stored in the key
-            [round(frame / fps, ndigits=ndigits), self.markers[frame].channel, str(self.markers[frame].channel)]
+            [round(frame / fps, ndigits=ndigits), 0, str(frame)]
             for frame in keys
         ]
         payloads = {
-            self.markers[frame].channel: self.markers[frame].payload.as_api_dict() for frame in keys
-        }
+            frame: self.markers[frame].payload.as_api_dict() for frame in keys
+        }#self.markers[frame].channel
 
         return {"version": 1, "events": events, "payloads": payloads}
 
