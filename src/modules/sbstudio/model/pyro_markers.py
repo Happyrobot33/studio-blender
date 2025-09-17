@@ -124,7 +124,8 @@ class PyroMarkers:
         #BUT in the payload key name, we will store a entire json string
 
         actual_events = [
-            [round(frame / fps, ndigits=ndigits), self.markers[frame].channel]
+            #time, channel, pitch, yaw, roll, prefire time
+            [round(frame / fps, ndigits=ndigits), self.markers[frame].channel, self.markers[frame].pitch, self.markers[frame].yaw, self.markers[frame].roll, round(self.markers[frame].payload.prefire_time, ndigits=ndigits)]
             for frame in keys
         ]
 
