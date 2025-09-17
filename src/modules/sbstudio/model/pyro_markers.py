@@ -120,7 +120,7 @@ class PyroMarkers:
             for frame in keys
         ]
         payloads = {
-            frame: self.markers[frame].payload.as_api_dict() for frame in keys
+            str(frame): self.markers[frame].payload.as_api_dict() for frame in keys
         }#self.markers[frame].channel
 
         return {"version": 1, "events": events, "payloads": payloads}
