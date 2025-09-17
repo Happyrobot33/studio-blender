@@ -87,6 +87,9 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
         self.name = pyro_control.name
         self.duration = pyro_control.duration
         self.prefire_time = pyro_control.prefire_time
+        self.pitch = pyro_control.pitch
+        self.yaw = pyro_control.yaw
+        self.roll = pyro_control.roll
 
         if event.type == "LEFTMOUSE":
             # We are being invoked from a button in the Pyro control panel.
