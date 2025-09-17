@@ -4,6 +4,8 @@ from json import dumps, loads
 import logging
 from typing import Any, TypeVar
 
+import bpy
+
 __all__ = ("PyroMarkers", "PyroPayload")
 
 C = TypeVar("C", bound="PyroMarkers")
@@ -111,10 +113,9 @@ class PyroMarkers:
         items = sorted(self.markers.items())
         keys = sorted(self.markers.keys())
         #print the keys
-        logger = logging.getLogger(__name__)
-        logger.setLevel(logging.DEBUG)
-        logger.addHandler(logging.StreamHandler())
-        logger.debug("keys: %s", keys)
+        log=bpy.data.texts.new('log')
+        log.clear() #flush
+        log.write(f"keys: {keys}\n")
         events = [
             #frame is stored in the key
             [round(frame / fps, ndigits=ndigits), self.markers[frame].channel]
