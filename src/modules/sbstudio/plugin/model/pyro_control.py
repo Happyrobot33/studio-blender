@@ -100,8 +100,8 @@ class PyroControlPanelProperties(PropertyGroup):
         name="Pitch",
         description="The pitch angle of the pyro effect",
         default=0,
-        min=-90,
-        max=90
+        min=-180,
+        max=180
     )
 
     yaw = IntProperty(
