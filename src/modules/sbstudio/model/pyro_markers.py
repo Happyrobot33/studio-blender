@@ -123,6 +123,9 @@ class PyroMarkers:
             str(channel): marker.payload.as_api_dict() for channel, marker in items
         }
 
+        log = logging.getLogger(__name__)
+        log.info({"version": 1, "events": events, "payloads": payloads})
+
         return {"version": 1, "events": events, "payloads": payloads}
 
     def as_str(self) -> str:
