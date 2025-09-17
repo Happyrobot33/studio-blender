@@ -112,15 +112,12 @@ class PyroMarkers:
         as a dictionary compatible with the Skybrush API."""
         items = sorted(self.markers.items())
         keys = sorted(self.markers.keys())
-        #print the keys
-        log=bpy.data.texts.new('log')
-        log.clear() #flush
-        log.write(f"keys: {keys}\n")
-        events = [
+        """ events = [
             #frame is stored in the key
             [round(frame / fps, ndigits=ndigits), self.markers[frame].channel]
             for frame in keys
-        ]
+        ] """
+        events = []
 
         return {"version": 1, "events": events}
 
