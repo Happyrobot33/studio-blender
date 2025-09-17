@@ -1,6 +1,7 @@
 from dataclasses import asdict, dataclass, field
 from json import dumps, loads
 
+import logging
 from typing import Any, TypeVar
 
 __all__ = ("PyroMarkers", "PyroPayload")
@@ -110,7 +111,8 @@ class PyroMarkers:
         items = sorted(self.markers.items())
         keys = sorted(self.markers.keys())
         #print the keys
-        print("keys:", keys)
+        logger = logging.getLogger(__name__)
+        logger.debug("keys: %s", keys)
         events = [
             #frame is stored in the key
             [round(frame / fps, ndigits=ndigits), self.markers[frame].channel]
