@@ -114,6 +114,7 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
         return True
 
     def _trigger_pyro_on_single_drone(self, drone, frame: int):
+        print(self.pitch, self.yaw, self.roll)
         add_pyro_marker_to_object(
             drone,
             frame=frame,
