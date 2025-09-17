@@ -39,6 +39,7 @@ class PyroMarker:
 
     channel: int
     """The frame number of the trigger event."""
+    frame: int
 
     pitch: int
     yaw: int
@@ -60,7 +61,7 @@ class PyroMarker:
         yaw = data.get("yaw", 0)
         roll = data.get("roll", 0)
 
-        return cls(payload=PyroPayload(**payload), channel=int(channel), pitch=int(pitch), yaw=int(yaw), roll=int(roll))
+        return cls(payload=PyroPayload(**payload), channel=int(channel), pitch=int(pitch), yaw=int(yaw), roll=int(roll), frame=0)
 
     def is_active_at_frame(self, frame: int, fps: float) -> bool:
         """Returns whether the pyro is active at the given frame"""
