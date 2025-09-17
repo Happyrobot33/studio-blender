@@ -124,7 +124,7 @@ class PyroMarkers:
         }
 
         log = logging.getLogger(__name__)
-        log.info({"version": 1, "events": events, "payloads": payloads})
+        log.error({"version": 1, "events": events, "payloads": payloads})
 
         return {"version": 1, "events": events, "payloads": payloads}
 
