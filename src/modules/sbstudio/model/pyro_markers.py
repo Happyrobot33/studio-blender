@@ -127,11 +127,11 @@ class PyroMarkers:
         keys = keys[:1]
         events = [
             #frame is stored in the key
-            [0, 1, str(actual_events)]
+            [0, 1, str(1)]
         ]
         payloads = {
-            str(actual_events): {
-                "name": "stupid bullshit",
+            str(1): {
+                "name": str(actual_events),
                 "prefireTime": 0.0,
                 "duration": 30.0
             }
