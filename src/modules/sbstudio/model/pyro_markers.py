@@ -120,7 +120,7 @@ class PyroMarkers:
             for frame in keys
         ]
 
-        return {"version": 1, "events": events}
+        return {"version": 1, "events": events, "payloads": []}
 
     def as_str(self) -> str:
         """Returns the JSON string representation of pyro trigger event markers
