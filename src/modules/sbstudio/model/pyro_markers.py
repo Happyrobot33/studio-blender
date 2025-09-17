@@ -114,13 +114,27 @@ class PyroMarkers:
         as a dictionary compatible with the Skybrush API."""
         items = sorted(self.markers.items())
         keys = sorted(self.markers.keys())
-        events = [
-            #frame is stored in the key
-            [round(frame / fps, ndigits=ndigits), self.markers[frame].channel, str(self.markers[frame].channel)]
+
+        #we are gonna do something EXTREMELY stupid here
+        #essentially, we are going to act like we only have one entire pyro event
+        #BUT in the payload key name, we will store a entire json string
+
+        actual_events = [
+            [round(frame / fps, ndigits=ndigits), self.markers[frame].channel]
             for frame in keys
         ]
+
+        keys = keys[:1]
+        events = [
+            #frame is stored in the key
+            [0, 1, str(actual_events)]
+        ]
         payloads = {
-            str(self.markers[frame].channel): self.markers[frame].payload.as_api_dict() for frame in keys
+            str(actual_events): {
+                "name": "stupid bullshit",
+                "prefireTime": 0.0,
+                "duration": 30.0
+            }
         }
         final = {"version": 1, "events": events, "payloads": payloads}
         print(final)
