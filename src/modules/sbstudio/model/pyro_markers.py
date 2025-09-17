@@ -115,6 +115,10 @@ class PyroMarkers:
         items = sorted(self.markers.items())
         keys = sorted(self.markers.keys())
 
+        #check if we dont have any markers
+        if len(items) == 0:
+            return {"version": 1, "events": [], "payloads": {}}
+
         #we are gonna do something EXTREMELY stupid here
         #essentially, we are going to act like we only have one entire pyro event
         #BUT in the payload key name, we will store a entire json string
