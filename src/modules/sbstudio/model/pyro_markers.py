@@ -108,10 +108,11 @@ class PyroMarkers:
         """Returns the pyro trigger event markers stored for a single drone
         as a dictionary compatible with the Skybrush API."""
         items = sorted(self.markers.items())
+        keys = sorted(self.markers.keys())
         events = [
             #frame is stored in the key
-            [round(key / fps, ndigits=ndigits), channel]
-            for channel, marker, key in items
+            [round(frame / fps, ndigits=ndigits), self.markers[frame].channel]
+            for frame in keys
         ]
 
         return {"version": 1, "events": events}
