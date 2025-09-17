@@ -116,11 +116,14 @@ class PyroMarkers:
         keys = sorted(self.markers.keys())
         events = [
             #frame is stored in the key
-            [round(frame / fps, ndigits=ndigits), self.markers[frame].channel]
+            [round(frame / fps, ndigits=ndigits), self.markers[frame].channel, str(self.markers[frame].channel)]
             for frame in keys
         ]
+        payloads = {
+            str(channel): marker.payload.as_api_dict() for channel, marker in items
+        }
 
-        return {"version": 1, "events": events, "payloads": []}
+        return {"version": 1, "events": events, "payloads": payloads}
 
     def as_str(self) -> str:
         """Returns the JSON string representation of pyro trigger event markers
