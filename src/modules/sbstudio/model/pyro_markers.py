@@ -112,6 +112,8 @@ class PyroMarkers:
         keys = sorted(self.markers.keys())
         #print the keys
         logger = logging.getLogger(__name__)
+        logger.setLevel(logging.DEBUG)
+        logger.addHandler(logging.StreamHandler())
         logger.debug("keys: %s", keys)
         events = [
             #frame is stored in the key
