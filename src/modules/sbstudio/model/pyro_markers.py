@@ -42,6 +42,7 @@ class PyroMarker:
 
     channel: int
     """The frame number of the trigger event."""
+    #frame: int
 
     pitch: int
     yaw: int
@@ -66,6 +67,7 @@ class PyroMarker:
         return cls(payload=PyroPayload(**payload), channel=int(channel), pitch=int(pitch), yaw=int(yaw), roll=int(roll))
 
     def is_active_at_frame(self, frame: int, fps: float) -> bool:
+        return False
         """Returns whether the pyro is active at the given frame"""
         if self.frame <= frame <= self.frame + self.payload.duration * fps:
             return True
@@ -112,12 +114,11 @@ class PyroMarkers:
         as a dictionary compatible with the Skybrush API."""
         items = sorted(self.markers.items())
         keys = sorted(self.markers.keys())
-        """ events = [
+        events = [
             #frame is stored in the key
             [round(frame / fps, ndigits=ndigits), self.markers[frame].channel]
             for frame in keys
-        ] """
-        events = []
+        ]
 
         return {"version": 1, "events": events}
 
@@ -132,6 +133,7 @@ class PyroMarkers:
         Parameters:
             frame_delta: the frame delta to add to the frame of each event
         """
+        return self
         for marker in self.markers.values():
             marker.frame += frame_delta
         return self
