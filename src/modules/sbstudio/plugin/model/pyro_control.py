@@ -65,7 +65,7 @@ class PyroControlPanelProperties(PropertyGroup):
         name="Channel",
         description="The (1-based) channel index the pyro is attached to",
         default=1,
-        min=1,
+        min=0,
         max=NUM_PYRO_CHANNELS,
     )
 

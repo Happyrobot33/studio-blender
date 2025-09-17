@@ -39,7 +39,6 @@ class PyroMarker:
 
     channel: int
     """The frame number of the trigger event."""
-    frame: int
 
     pitch: int
     yaw: int
@@ -61,7 +60,7 @@ class PyroMarker:
         yaw = data.get("yaw", 0)
         roll = data.get("roll", 0)
 
-        return cls(payload=PyroPayload(**payload), channel=int(channel), pitch=int(pitch), yaw=int(yaw), roll=int(roll), frame=0)
+        return cls(payload=PyroPayload(**payload), channel=int(channel), pitch=int(pitch), yaw=int(yaw), roll=int(roll))
 
     def is_active_at_frame(self, frame: int, fps: float) -> bool:
         """Returns whether the pyro is active at the given frame"""
@@ -110,14 +109,12 @@ class PyroMarkers:
         as a dictionary compatible with the Skybrush API."""
         items = sorted(self.markers.items())
         events = [
-            [round(marker.frame / fps, ndigits=ndigits), channel - 1, str(channel)]
-            for channel, marker in items
+            #frame is stored in the key
+            [round(key / fps, ndigits=ndigits), channel]
+            for channel, marker, key in items
         ]
-        payloads = {
-            str(channel): marker.payload.as_api_dict() for channel, marker in items
-        }
 
-        return {"version": 1, "events": events, "payloads": payloads}
+        return {"version": 1, "events": events}
 
     def as_str(self) -> str:
         """Returns the JSON string representation of pyro trigger event markers

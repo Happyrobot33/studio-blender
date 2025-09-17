@@ -25,7 +25,7 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
     channel = IntProperty(
         name="Channel",
         description="The (1-based) channel index the pyro is attached to",
-        min=1,
+        min=0,
         max=NUM_PYRO_CHANNELS,
     )
 
