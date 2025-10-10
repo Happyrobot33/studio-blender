@@ -37,6 +37,8 @@ a single coordinate and a Color.
 """
 
 DEFAULT_PYRO_OVERLAY_MARKER_COLOR: Color = (0.5, 0.5, 0.5)
+DEFAULT_PYRO_OVERLAY_DIRECTION_COLOR: Color = (1.0, 0.0, 0.0)
+DEFAULT_PYRO_OVERLAY_YAW_COLOR: Color = (0.0, 1.0, 0.0)
 """Default color for pyro marker overlays."""
 
 

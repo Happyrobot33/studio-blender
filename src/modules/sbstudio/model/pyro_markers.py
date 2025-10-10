@@ -82,7 +82,7 @@ class PyroMarkers:
     We assume that each pyro channel contains only a single pyro event."""
 
     markers: dict[int, PyroMarker] = field(default_factory=dict)
-    """The list of pyro trigger markers, indexed by the pyro channel."""
+    """The list of pyro trigger markers, indexed by the frame"""
 
     @classmethod
     def from_dict(cls, data: dict[int, PyroMarker]):
@@ -92,10 +92,11 @@ class PyroMarkers:
     @classmethod
     def from_str(cls, data: str):
         """Creates a pyro markers object from its string representation."""
+        print("Pyro data:", data)
         return cls(
             markers={
-                int(channel): PyroMarker.from_dict(marker)
-                for channel, marker in loads(data).items()
+                int(frame): PyroMarker.from_dict(marker)
+                for frame, marker in loads(data).items()
             }
             if data
             else {}
@@ -105,8 +106,8 @@ class PyroMarkers:
         """Returns the pyro trigger event markers stored for a single drone
         as a dictionary."""
         return {
-            int(channel): asdict(marker)
-            for channel, marker in sorted(self.markers.items())
+            int(frame): asdict(marker)
+            for frame, marker in sorted(self.markers.items())
         }
 
     def as_api_dict(self, fps: int, ndigits: int = 3) -> dict[str, Any]:

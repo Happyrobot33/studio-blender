@@ -59,4 +59,8 @@ class CalculatePyroMarkers(Operator):
             markers = get_pyro_markers_of_object(drone)
             for frame in markers.markers:
                 channel = markers.markers[frame].channel
-                m = scene.timeline_markers.new(name=f"Pyro {channel}, {drone.name}", frame=frame)
+                pitch = markers.markers[frame].pitch
+                yaw = markers.markers[frame].yaw
+                roll = markers.markers[frame].roll
+                prefire = markers.markers[frame].payload.prefire_time
+                m = scene.timeline_markers.new(name=f"Pyro {channel} on {drone.name}, Pitch: {pitch}, Yaw: {yaw}, Roll: {roll} Prefire: {prefire}", frame=frame)
