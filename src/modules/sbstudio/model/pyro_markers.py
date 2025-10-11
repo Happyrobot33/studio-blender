@@ -126,7 +126,7 @@ class PyroMarkers:
 
         actual_events = [
             #time, channel, pitch, yaw, roll, prefire time
-            [round(frame / fps, ndigits=ndigits), self.markers[frame].channel, self.markers[frame].pitch, self.markers[frame].yaw, self.markers[frame].roll, round(self.markers[frame].payload.prefire_time, ndigits=ndigits)]
+            [round(frame / fps, ndigits=ndigits), self.markers[frame].channel, self.markers[frame].pitch, self.markers[frame].yaw, self.markers[frame].roll, round(self.markers[frame].payload.prefire_time, ndigits=ndigits), round(self.markers[frame].payload.duration, ndigits=ndigits)]
             for frame in keys
         ]
 
