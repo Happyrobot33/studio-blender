@@ -92,7 +92,6 @@ class PyroMarkers:
     @classmethod
     def from_str(cls, data: str):
         """Creates a pyro markers object from its string representation."""
-        print("Pyro data:", data)
         return cls(
             markers={
                 int(frame): PyroMarker.from_dict(marker)
