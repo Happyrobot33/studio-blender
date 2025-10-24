@@ -555,6 +555,7 @@ def export_show_to_file_using_api(
         if format is FileFormat.SKYC:
             log.info("Exporting show to Skybrush .skyc format")
             renderer = "skyc"
+            renderer_params = {"optimize_light_program": False}
         elif format is FileFormat.CSV:
             log.info("Exporting show to Skybrush .csv format")
             renderer = "csv"
