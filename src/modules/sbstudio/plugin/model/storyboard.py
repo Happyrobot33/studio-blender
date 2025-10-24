@@ -911,22 +911,22 @@ class Storyboard(PropertyGroup, ListMixin):
                 )
 
     def _on_active_entry_moving_down(self, this_entry, next_entry) -> bool:
-        pad = next_entry.frame_start - this_entry.frame_end
+        """ pad = next_entry.frame_start - this_entry.frame_end
 
         this_entry.frame_start, next_entry.frame_start = (
             this_entry.frame_start + next_entry.duration + pad,
             this_entry.frame_start,
-        )
+        ) """
 
         return True
 
     def _on_active_entry_moving_up(self, this_entry, prev_entry) -> bool:
-        pad = this_entry.frame_start - prev_entry.frame_end
+        """ pad = this_entry.frame_start - prev_entry.frame_end
 
         this_entry.frame_start, prev_entry.frame_start = (
             prev_entry.frame_start,
             prev_entry.frame_start + this_entry.duration + pad,
-        )
+        ) """
 
         return True
 

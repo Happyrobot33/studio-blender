@@ -46,7 +46,7 @@ DEFAULT_INDOOR_DRONE_RADIUS = 0.1
 DEFAULT_OUTDOOR_DRONE_RADIUS = 0.5
 """Default outdoor drone radius"""
 
-NUM_PYRO_CHANNELS = 6
+NUM_PYRO_CHANNELS = 255
 """The number of pyro channels that we support."""
 
 RANDOM_SEED_MAX = 0x7FFFFFFF

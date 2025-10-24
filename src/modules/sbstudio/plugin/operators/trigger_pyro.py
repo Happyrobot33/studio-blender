@@ -4,7 +4,8 @@ from bpy.types import Operator
 from sbstudio.plugin.constants import NUM_PYRO_CHANNELS
 from sbstudio.model.pyro_markers import PyroMarker, PyroPayload
 from sbstudio.plugin.selection import get_selected_drones
-from sbstudio.plugin.utils.pyro_markers import add_pyro_marker_to_object
+from sbstudio.plugin.utils.pyro_markers import add_pyro_marker_to_object, get_pyro_markers_of_object
+from sbstudio.plugin.constants import Collections
 
 __all__ = ("TriggerPyroOnSelectedDronesOperator",)
 
@@ -24,7 +25,7 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
     channel = IntProperty(
         name="Channel",
         description="The (1-based) channel index the pyro is attached to",
-        min=1,
+        min=0,
         max=NUM_PYRO_CHANNELS,
     )
 
@@ -50,6 +51,30 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
         step=100,  # button step is 1/100th of step
     )
 
+    pitch = IntProperty(
+        name="Pitch",
+        description="The pitch angle of the pyro effect",
+        default=0,
+        min=-180,
+        max=180
+    )
+
+    yaw = IntProperty(
+        name="Yaw",
+        description="The yaw angle of the pyro effect",
+        default=0,
+        min=-180,
+        max=180
+    )
+
+    roll = IntProperty(
+        name="Roll",
+        description="The roll angle of the pyro effect",
+        default=0,
+        min=-180,
+        max=180
+    )
+
     def execute(self, context):
         # This code path is invoked after an undo-redo
         return {"FINISHED"} if self._run(context) else {"CANCELLED"}
@@ -62,6 +87,9 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
         self.name = pyro_control.name
         self.duration = pyro_control.duration
         self.prefire_time = pyro_control.prefire_time
+        self.pitch = pyro_control.pitch
+        self.yaw = pyro_control.yaw
+        self.roll = pyro_control.roll
 
         if event.type == "LEFTMOUSE":
             # We are being invoked from a button in the Pyro control panel.
@@ -82,19 +110,26 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
         frame = context.scene.frame_current
         for drone in selection:
             self._trigger_pyro_on_single_drone(drone, frame)
+        
+        from sbstudio.plugin.operators import CalculatePyroMarkers
+        CalculatePyroMarkers._recalculate_pyro_markers(context)
 
         return True
 
     def _trigger_pyro_on_single_drone(self, drone, frame: int):
+        print(self.pitch, self.yaw, self.roll)
         add_pyro_marker_to_object(
             drone,
-            channel=self.channel,
+            frame=frame,
             marker=PyroMarker(
-                frame=frame,
+                channel=self.channel,
                 payload=PyroPayload(
                     name=self.name,
                     duration=self.duration,
                     prefire_time=self.prefire_time,
                 ),
+                pitch=self.pitch,
+                yaw=self.yaw,
+                roll=self.roll
             ),
         )

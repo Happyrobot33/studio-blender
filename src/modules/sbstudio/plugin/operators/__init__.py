@@ -62,6 +62,8 @@ from .set_server_url import SetServerURLOperator
 from .swap_colors import SwapColorsInLEDControlPanelOperator
 from .takeoff import TakeoffOperator
 from .trigger_pyro import TriggerPyroOnSelectedDronesOperator
+from .remove_pyro import RemovePyroOnSelectedDronesOperator
+from .calculate_pyro_markers import CalculatePyroMarkers
 from .update_formation import UpdateFormationOperator
 from .update_time_markers_from_storyboard import UpdateTimeMarkersFromStoryboardOperator
 from .update_frame_range_from_storyboard import UpdateFrameRangeFromStoryboardOperator
@@ -124,6 +126,8 @@ __all__ = (
     "SwapColorsInLEDControlPanelOperator",
     "TakeoffOperator",
     "TriggerPyroOnSelectedDronesOperator",
+    "RemovePyroOnSelectedDronesOperator",
+    "CalculatePyroMarkers",
     "UpdateFormationOperator",
     "UpdateFrameRangeFromStoryboardOperator",
     "UpdateTimeMarkersFromStoryboardOperator",

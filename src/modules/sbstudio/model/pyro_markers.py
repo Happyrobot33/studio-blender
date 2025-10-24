@@ -1,7 +1,10 @@
 from dataclasses import asdict, dataclass, field
 from json import dumps, loads
 
+import logging
 from typing import Any, TypeVar
+
+import bpy
 
 __all__ = ("PyroMarkers", "PyroPayload")
 
@@ -26,7 +29,7 @@ class PyroPayload:
         return {
             "name": self.name,
             "duration": self.duration,
-            "prefireTime": self.prefire_time,
+            "prefireTime": self.prefire_time
         }
 
 
@@ -37,8 +40,13 @@ class PyroMarker:
 
     So far we assume that one channel can be used only once for pyro triggering."""
 
-    frame: int
+    channel: int
     """The frame number of the trigger event."""
+    #frame: int
+
+    pitch: int
+    yaw: int
+    roll: int
 
     payload: PyroPayload
     """Properties of the pyro payload attached."""
@@ -48,13 +56,18 @@ class PyroMarker:
         payload = data.get("payload")
         if payload is None:
             raise ValueError("payload field is missing")
-        frame = data.get("frame")
-        if frame is None:
-            raise ValueError("frame field is missing")
+        channel = data.get("channel")
+        if channel is None:
+            raise ValueError("channel field is missing")
+        
+        pitch = data.get("pitch", 0)
+        yaw = data.get("yaw", 0)
+        roll = data.get("roll", 0)
 
-        return cls(payload=PyroPayload(**payload), frame=int(frame))
+        return cls(payload=PyroPayload(**payload), channel=int(channel), pitch=int(pitch), yaw=int(yaw), roll=int(roll))
 
     def is_active_at_frame(self, frame: int, fps: float) -> bool:
+        return False
         """Returns whether the pyro is active at the given frame"""
         if self.frame <= frame <= self.frame + self.payload.duration * fps:
             return True
@@ -69,7 +82,7 @@ class PyroMarkers:
     We assume that each pyro channel contains only a single pyro event."""
 
     markers: dict[int, PyroMarker] = field(default_factory=dict)
-    """The list of pyro trigger markers, indexed by the pyro channel."""
+    """The list of pyro trigger markers, indexed by the frame"""
 
     @classmethod
     def from_dict(cls, data: dict[int, PyroMarker]):
@@ -81,8 +94,8 @@ class PyroMarkers:
         """Creates a pyro markers object from its string representation."""
         return cls(
             markers={
-                int(channel): PyroMarker.from_dict(marker)
-                for channel, marker in loads(data).items()
+                int(frame): PyroMarker.from_dict(marker)
+                for frame, marker in loads(data).items()
             }
             if data
             else {}
@@ -92,23 +105,46 @@ class PyroMarkers:
         """Returns the pyro trigger event markers stored for a single drone
         as a dictionary."""
         return {
-            int(channel): asdict(marker)
-            for channel, marker in sorted(self.markers.items())
+            int(frame): asdict(marker)
+            for frame, marker in sorted(self.markers.items())
         }
 
     def as_api_dict(self, fps: int, ndigits: int = 3) -> dict[str, Any]:
         """Returns the pyro trigger event markers stored for a single drone
         as a dictionary compatible with the Skybrush API."""
         items = sorted(self.markers.items())
+        keys = sorted(self.markers.keys())
+
+        #check if we dont have any markers
+        if len(items) == 0:
+            return {"version": 1, "events": [], "payloads": {}}
+
+        #we are gonna do something EXTREMELY stupid here
+        #essentially, we are going to act like we only have one entire pyro event
+        #BUT in the payload key name, we will store a entire json string
+
+        actual_events = [
+            #time, channel, pitch, yaw, roll, prefire time
+            [round(frame / fps, ndigits=ndigits), self.markers[frame].channel, self.markers[frame].pitch, self.markers[frame].yaw, self.markers[frame].roll, round(self.markers[frame].payload.prefire_time, ndigits=ndigits), round(self.markers[frame].payload.duration, ndigits=ndigits)]
+            for frame in keys
+        ]
+
+        keys = keys[:1]
         events = [
-            [round(marker.frame / fps, ndigits=ndigits), channel - 1, str(channel)]
-            for channel, marker in items
+            #frame is stored in the key
+            [0, 1, str(1)]
         ]
         payloads = {
-            str(channel): marker.payload.as_api_dict() for channel, marker in items
+            str(1): {
+                "name": str(actual_events),
+                "prefireTime": 0.0,
+                "duration": 30.0
+            }
         }
+        final = {"version": 1, "events": events, "payloads": payloads}
+        print(final)
 
-        return {"version": 1, "events": events, "payloads": payloads}
+        return final
 
     def as_str(self) -> str:
         """Returns the JSON string representation of pyro trigger event markers
@@ -121,6 +157,7 @@ class PyroMarkers:
         Parameters:
             frame_delta: the frame delta to add to the frame of each event
         """
+        return self
         for marker in self.markers.values():
             marker.frame += frame_delta
         return self
