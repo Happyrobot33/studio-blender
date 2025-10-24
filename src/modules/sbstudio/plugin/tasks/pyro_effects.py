@@ -16,6 +16,7 @@ from sbstudio.plugin.overlays.pyro import (
     DEFAULT_PYRO_OVERLAY_MARKER_COLOR,
     DEFAULT_PYRO_OVERLAY_DIRECTION_COLOR,
     DEFAULT_PYRO_OVERLAY_YAW_COLOR,
+    PyroOverlayInfo,
     PyroOverlayMarker,
 )
 from sbstudio.plugin.utils.evaluator import get_position_of_object
@@ -64,7 +65,7 @@ def run_update_pyro_overlay_markers(scene: Scene, depsgraph) -> None:
 
     pyro_control = scene.skybrush.pyro_control
 
-    if pyro_control.visualization == "MARKERS":
+    if pyro_control.visualization in ["MARKERS", "INFO"]:
         drones = Collections.find_drones(create=False)
     else:
         drones = None
@@ -78,6 +79,7 @@ def run_update_pyro_overlay_markers(scene: Scene, depsgraph) -> None:
     frame = scene.frame_current
     fps = scene.render.fps
     overlay_markers: list[PyroOverlayMarker] = []
+    overlay_info_blocks: list[PyroOverlayInfo] = []
     for drone in drones.objects:
         markers = get_pyro_markers_of_object(drone)
         if markers is None:
@@ -119,6 +121,7 @@ def run_update_pyro_overlay_markers(scene: Scene, depsgraph) -> None:
         overlay_markers.append((tuple(yawindicatorposition), DEFAULT_PYRO_OVERLAY_YAW_COLOR))
 
     pyro_control.update_pyro_overlay_markers(overlay_markers)
+    pyro_control.update_pyro_overlay_info_blocks(overlay_info_blocks)
 
 
 def ensure_overlays_enabled():

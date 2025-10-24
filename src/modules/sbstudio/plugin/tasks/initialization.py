@@ -71,6 +71,30 @@ def update_pyro_particles_of_drones(*args):
         update_pyro_particles_of_object(drone)
 
 
+def regenerate_storyboard_entries_or_transitions(*args):
+    """Regenerates storyboard entries or transitions so that
+    old files not containing this property have it initialized
+    properly to be used in the light effect's 'attach to' dropdown."""
+    scene = bpy.context.scene
+    if scene and scene.skybrush.storyboard:
+        scene.skybrush.storyboard._regenerate_entries_or_transitions()
+
+
+def _config_logging(*args):
+    import logging
+
+    logging.basicConfig(
+        format="%(asctime)s.%(msecs)03d %(levelname)s: %(message)s",
+        level=logging.INFO,
+        datefmt="%H:%M:%S",
+    )
+
+
+def perform_migrations(*args):
+    # version 1 -> 2
+    bpy.ops.skybrush.use_shared_material_for_all_drones_migration("INVOKE_DEFAULT")
+
+
 class InitializationTask(Task):
     """Background task that is called every time a new file is loaded."""
 
@@ -81,5 +105,9 @@ class InitializationTask(Task):
             remove_legacy_formation_constraints,
             setup_random_seed,
             update_pyro_particles_of_drones,
+            regenerate_storyboard_entries_or_transitions,
+            # enable this below for neat logs
+            # _config_logging,
+            perform_migrations,
         ]
     }
