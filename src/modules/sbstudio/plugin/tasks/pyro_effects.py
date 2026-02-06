@@ -86,7 +86,7 @@ def run_update_pyro_overlay_markers(scene: Scene, depsgraph) -> None:
             continue
 
         #print markers
-        print(frame, markers)
+        #print(frame, markers)
         if frame not in markers.markers:
             continue
 
