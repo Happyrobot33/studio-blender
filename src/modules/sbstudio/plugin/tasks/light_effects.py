@@ -54,7 +54,7 @@ def update_light_effects(scene: Scene, depsgraph: Depsgraph):
         return
 
     light_effects = scene.skybrush.light_effects
-    if not light_effects:
+    if not light_effects or not light_effects.enabled:
         return
 
     random_seq = scene.skybrush.settings.random_sequence_root
