@@ -31,12 +31,6 @@ class SwarmPanel(Panel):
         layout.prop(settings, "drone_collection", text="Drones")
         layout.prop(settings, "max_acceleration", slider=True)
 
-        # Add light effects toggle
-        layout.separator()
-        light_effects = scene.skybrush.light_effects
-        if light_effects:
-            layout.prop(light_effects, "enabled", text="Light Effects")
-
         if Collections.find_templates(create=False) is None:
             layout.prop(settings, "drone_template", text="Drone")
             row = layout.row(heading="Drone radius")
