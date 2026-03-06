@@ -13,6 +13,7 @@ class BlendMode(IntEnum):
     OVERLAY = auto()
     SOFT_LIGHT = auto()
     HARD_LIGHT = auto()
+    ADDITIVE = auto()
 
     # Do not change the order of items above to remain compatible with already
     # saved Blender scenes.
@@ -107,6 +108,11 @@ def _blend_soft_light(
                 + b * backdrop[i]
             )
 
+def _blend_add(
+    source: Sequence[float], backdrop: MutableSequence[float], a: float, b: float
+) -> None:
+    for i in range(3):
+        backdrop[i] = min(a * (source[i] + backdrop[i]) + b * backdrop[i], 1.0)
 
 def _blend_nop(
     source: Sequence[float], backdrop: MutableSequence[float], a: float, b: float
@@ -126,6 +132,7 @@ _blend_funcs: List[
     _blend_overlay,
     _blend_soft_light,
     _blend_hard_light,
+    _blend_add,
 ]
 
 
