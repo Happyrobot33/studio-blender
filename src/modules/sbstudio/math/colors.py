@@ -1,5 +1,6 @@
 from enum import auto, IntEnum
 from typing import Callable, List, MutableSequence, Sequence
+import mathutils
 
 __all__ = ("blend_in_place", "BlendMode")
 
@@ -14,6 +15,7 @@ class BlendMode(IntEnum):
     SOFT_LIGHT = auto()
     HARD_LIGHT = auto()
     ADDITIVE = auto()
+    HUESHIFT = auto()
 
     # Do not change the order of items above to remain compatible with already
     # saved Blender scenes.
@@ -114,6 +116,28 @@ def _blend_add(
     for i in range(3):
         backdrop[i] = min(a * (source[i] + backdrop[i]) + b * backdrop[i], 1.0)
 
+def _blend_hueshift(
+    source: Sequence[float], backdrop: MutableSequence[float], a: float, b: float
+) -> None:
+    #converts RGB to HSV
+    backcol = mathutils.Color()
+    backcol.r = backdrop[0]
+    backcol.g = backdrop[1]
+    backcol.b = backdrop[2]
+    forecol = mathutils.Color()
+    forecol.r = source[0]
+    forecol.g = source[1]
+    forecol.b = source[2]
+    backhsv = backcol.hsv
+    forehsv = forecol.hsv
+    #shifts the hue by the brightness of the backdrop
+    newhue = (forehsv[0] + backhsv[2]) % 1.0
+    #converts back to RGB
+    newcol = mathutils.Color()
+    newcol.hsv = (newhue, backhsv[1], backhsv[2])
+    for i in range(3):
+        backdrop[i] = a * newcol[i] + b * backdrop[i]
+
 def _blend_nop(
     source: Sequence[float], backdrop: MutableSequence[float], a: float, b: float
 ) -> None:
@@ -133,6 +157,7 @@ _blend_funcs: List[
     _blend_soft_light,
     _blend_hard_light,
     _blend_add,
+    _blend_hueshift,
 ]
 
 
