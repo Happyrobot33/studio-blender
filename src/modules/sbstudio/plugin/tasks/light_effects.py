@@ -45,6 +45,10 @@ drone.
 def update_light_effects(scene: Scene, depsgraph: Depsgraph):
     global _last_frame, _base_color_cache, _suspension_counter, WHITE
 
+    print("UPDATING LIGHT EFFECTS")
+
+    
+
     # This function is going to be evaluated in every frame, so we should walk
     # the extra mile to ensure that the number of object allocations is as low
     # as possible -- therefore there are lots of in-place modifications of
