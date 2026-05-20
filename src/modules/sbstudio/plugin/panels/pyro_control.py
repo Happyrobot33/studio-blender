@@ -53,6 +53,12 @@ class PyroControlPanel(Panel):
 
         layout.separator()
 
+        layout.prop(pyro_control, "primary_color")
+        layout.prop(pyro_control, "secondary_color")
+        layout.prop(pyro_control, "volume")
+
+        layout.separator()
+
         layout.operator(TriggerPyro.bl_idname, text="Trigger")
         layout.operator(RemovePyro.bl_idname, text="Remove on this frame")
         layout.operator(CalculatePyroMarkers.bl_idname, text="Recalculate Markers")

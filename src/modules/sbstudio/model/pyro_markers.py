@@ -48,6 +48,15 @@ class PyroMarker:
     yaw: int
     roll: int
 
+    primary_color: tuple[float, float, float]
+    """Primary color (R, G, B) with values from 0 to 1."""
+
+    secondary_color: tuple[float, float, float]
+    """Secondary color (R, G, B) with values from 0 to 1."""
+
+    volume: float
+    """Volume level from 0 to 1."""
+
     payload: PyroPayload
     """Properties of the pyro payload attached."""
 
@@ -63,8 +72,22 @@ class PyroMarker:
         pitch = data.get("pitch", 0)
         yaw = data.get("yaw", 0)
         roll = data.get("roll", 0)
+        
+        primary_color = data.get("primary_color", (1.0, 1.0, 1.0))
+        if isinstance(primary_color, (list, tuple)):
+            primary_color = tuple(float(c) for c in primary_color)
+        else:
+            primary_color = (1.0, 1.0, 1.0)
+        
+        secondary_color = data.get("secondary_color", (0.0, 0.0, 0.0))
+        if isinstance(secondary_color, (list, tuple)):
+            secondary_color = tuple(float(c) for c in secondary_color)
+        else:
+            secondary_color = (0.0, 0.0, 0.0)
+        
+        volume = float(data.get("volume", 1.0))
 
-        return cls(payload=PyroPayload(**payload), channel=int(channel), pitch=int(pitch), yaw=int(yaw), roll=int(roll))
+        return cls(payload=PyroPayload(**payload), channel=int(channel), pitch=int(pitch), yaw=int(yaw), roll=int(roll), primary_color=primary_color, secondary_color=secondary_color, volume=volume)
 
     def is_active_at_frame(self, frame: int, fps: float) -> bool:
         return False
@@ -124,8 +147,8 @@ class PyroMarkers:
         #BUT in the payload key name, we will store a entire json string
 
         actual_events = [
-            #time, channel, pitch, yaw, roll, prefire time
-            [round(frame / fps, ndigits=ndigits), self.markers[frame].channel, self.markers[frame].pitch, self.markers[frame].yaw, self.markers[frame].roll, round(self.markers[frame].payload.prefire_time, ndigits=ndigits), round(self.markers[frame].payload.duration, ndigits=ndigits)]
+            #time, channel, pitch, yaw, roll, primary_color, secondary_color, volume, prefire time, duration
+            [round(frame / fps, ndigits=ndigits), self.markers[frame].channel, self.markers[frame].pitch, self.markers[frame].yaw, self.markers[frame].roll, self.markers[frame].primary_color, self.markers[frame].secondary_color, round(self.markers[frame].volume, ndigits=ndigits), round(self.markers[frame].payload.prefire_time, ndigits=ndigits), round(self.markers[frame].payload.duration, ndigits=ndigits)]
             for frame in keys
         ]
 

@@ -57,4 +57,7 @@ class CalculatePyroMarkers(Operator):
                 yaw = markers.markers[frame].yaw
                 roll = markers.markers[frame].roll
                 prefire = markers.markers[frame].payload.prefire_time
-                m = scene.timeline_markers.new(name=f"Pyro {channel} on {drone.name}, Pitch: {pitch}, Yaw: {yaw}, Roll: {roll} Prefire: {prefire}", frame=frame)
+                primary_color = markers.markers[frame].primary_color
+                secondary_color = markers.markers[frame].secondary_color
+                volume = markers.markers[frame].volume
+                m = scene.timeline_markers.new(name=f"Pyro {channel} on {drone.name}, Pitch: {pitch}, Yaw: {yaw}, Roll: {roll}, Primary: {primary_color}, Secondary: {secondary_color}, Volume: {volume:.1f}, Prefire: {prefire}", frame=frame)

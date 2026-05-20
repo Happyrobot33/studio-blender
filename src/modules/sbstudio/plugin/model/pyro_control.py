@@ -3,9 +3,10 @@ from bpy.types import Context, PropertyGroup
 
 from typing import overload
 
-from sbstudio.plugin.constants import Collections, NUM_PYRO_CHANNELS
-
+from sbstudio.plugin.constants import Collections
+from sbstudio.plugin.props.color import ColorProperty
 from sbstudio.plugin.utils.pyro_markers import update_pyro_particles_of_object
+from sbstudio.plugin.model.pyro_options import PYRO_CHANNEL_OPTIONS
 from sbstudio.plugin.overlays.pyro import (
     PyroOverlay,
     PyroOverlayInfo,
@@ -63,12 +64,11 @@ class PyroControlPanelProperties(PropertyGroup):
         update=visualization_updated,
     )
 
-    channel = IntProperty(
+    channel = EnumProperty(
         name="Channel",
-        description="The (1-based) channel index the pyro is attached to",
-        default=1,
-        min=0,
-        max=NUM_PYRO_CHANNELS,
+        description="The pyro channel and effect type",
+        items=PYRO_CHANNEL_OPTIONS,
+        default="1",
     )
 
     # pyro payload properties
@@ -120,6 +120,27 @@ class PyroControlPanelProperties(PropertyGroup):
         default=0,
         min=-180,
         max=180
+    )
+
+    primary_color = ColorProperty(
+        name="Primary Color",
+        description="The primary color of the pyro effect",
+        default=(1.0, 1.0, 1.0)
+    )
+
+    secondary_color = ColorProperty(
+        name="Secondary Color",
+        description="The secondary color of the pyro effect",
+        default=(0.0, 0.0, 0.0)
+    )
+
+    volume = FloatProperty(
+        name="Volume",
+        description="The volume level of the pyro effect (0 to 1)",
+        default=1.0,
+        min=0.0,
+        max=1.0,
+        step=10  # button step is 1/10th of step
     )
 
     def clear_pyro_overlay_markers(self) -> None:

@@ -1,7 +1,8 @@
-from bpy.props import FloatProperty, IntProperty, StringProperty
+from bpy.props import EnumProperty, FloatProperty, IntProperty, StringProperty
 from bpy.types import Operator
 
-from sbstudio.plugin.constants import NUM_PYRO_CHANNELS
+from sbstudio.plugin.props.color import ColorProperty
+from sbstudio.plugin.model.pyro_options import PYRO_CHANNEL_OPTIONS
 from sbstudio.model.pyro_markers import PyroMarker, PyroPayload
 from sbstudio.plugin.selection import get_selected_drones
 from sbstudio.plugin.utils.pyro_markers import add_pyro_marker_to_object, get_pyro_markers_of_object
@@ -22,11 +23,11 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
     )
     bl_options = {"REGISTER", "UNDO"}
 
-    channel = IntProperty(
+    channel = EnumProperty(
         name="Channel",
-        description="The (1-based) channel index the pyro is attached to",
-        min=0,
-        max=NUM_PYRO_CHANNELS,
+        description="The pyro channel and effect type",
+        items=PYRO_CHANNEL_OPTIONS,
+        default="1",
     )
 
     name = StringProperty(
@@ -75,6 +76,27 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
         max=180
     )
 
+    primary_color = ColorProperty(
+        name="Primary Color",
+        description="The primary color of the pyro effect",
+        default=(1.0, 1.0, 1.0)
+    )
+
+    secondary_color = ColorProperty(
+        name="Secondary Color",
+        description="The secondary color of the pyro effect",
+        default=(0.0, 0.0, 0.0)
+    )
+
+    volume = FloatProperty(
+        name="Volume",
+        description="The volume level of the pyro effect (0 to 1)",
+        default=1.0,
+        min=0.0,
+        max=1.0,
+        step=10
+    )
+
     def execute(self, context):
         # This code path is invoked after an undo-redo
         return {"FINISHED"} if self._run(context) else {"CANCELLED"}
@@ -90,6 +112,9 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
         self.pitch = pyro_control.pitch
         self.yaw = pyro_control.yaw
         self.roll = pyro_control.roll
+        self.primary_color = pyro_control.primary_color
+        self.secondary_color = pyro_control.secondary_color
+        self.volume = pyro_control.volume
 
         if event.type == "LEFTMOUSE":
             # We are being invoked from a button in the Pyro control panel.
@@ -122,7 +147,7 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
             drone,
             frame=frame,
             marker=PyroMarker(
-                channel=self.channel,
+                channel=int(self.channel),
                 payload=PyroPayload(
                     name=self.name,
                     duration=self.duration,
@@ -130,6 +155,9 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
                 ),
                 pitch=self.pitch,
                 yaw=self.yaw,
-                roll=self.roll
+                roll=self.roll,
+                primary_color=tuple(self.primary_color),
+                secondary_color=tuple(self.secondary_color),
+                volume=self.volume
             ),
         )
