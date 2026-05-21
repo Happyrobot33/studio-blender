@@ -13,6 +13,11 @@ __all__ = (
 
 is_blender_4 = bpy.app.version >= (4, 0, 0)
 
+#: Cache for drone colors. Maps drone object IDs to their RGBA colors.
+#: Used since the shader approach was introduced and drone.color property
+#: should not be modified directly.
+_drone_color_cache: dict[int, RGBAColor] = {}
+
 
 def create_keyframe_for_color_of_drone(
     drone: Object,
@@ -54,10 +59,10 @@ def get_color_of_drone(drone) -> RGBAColor:
 
     Parameters:
         drone: the drone to query
-        color: the color to apply to the LED light of the drone
     """
-    if drone.color is not None:
-        return drone.color
+    drone_id = id(drone)
+    if drone_id in _drone_color_cache:
+        return _drone_color_cache[drone_id]
 
     return (0.0, 0.0, 0.0, 0.0)
 
@@ -69,4 +74,15 @@ def set_color_of_drone(drone, color: RGBAColorLike):
         drone: the drone to update
         color: the color to apply to the LED light of the drone
     """
-    drone.color = color
+    # Normalize color to RGBA tuple
+    if hasattr(color, "r"):
+        color_as_rgba = (color.r, color.g, color.b, getattr(color, "a", 1.0))
+    else:
+        # Ensure it's a 4-tuple (add alpha=1.0 if needed)
+        color_tuple = tuple(color)
+        if len(color_tuple) == 3:
+            color_as_rgba = (color_tuple[0], color_tuple[1], color_tuple[2], 1.0)
+        else:
+            color_as_rgba = color_tuple  # type: ignore
+    
+    _drone_color_cache[id(drone)] = color_as_rgba  # type: ignore

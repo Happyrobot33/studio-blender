@@ -12,7 +12,7 @@ from .base import Task
 
 from sbstudio.model.types import MutableRGBAColor, RGBAColor
 from sbstudio.plugin.constants import Collections
-from sbstudio.plugin.colors import get_color_of_drone
+from sbstudio.plugin.colors import get_color_of_drone, set_color_of_drone
 from sbstudio.plugin.model.light_effects import get_overlay as get_light_effects_overlay
 from sbstudio.plugin.utils.evaluator import get_position_of_object
 
@@ -126,6 +126,7 @@ def update_light_effects(scene: Scene, depsgraph: Depsgraph):
         for drone, color in zip(drones, colors):
             position = get_position_of_object(drone)
             overlay_markers.append((position, tuple(color)))
+            set_color_of_drone(drone, color)
 
     # Update the light effects overlay with the computed colors
     # Create overlay if we have markers to display, otherwise just get it if it exists
