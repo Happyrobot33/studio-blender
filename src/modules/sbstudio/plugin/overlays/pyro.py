@@ -4,11 +4,13 @@ import blf
 import bpy
 import gpu
 import gpu.state
+import math
 
 from bpy_extras.view3d_utils import location_3d_to_region_2d
 from bpy.types import SpaceView3D
 from gpu_extras.batch import batch_for_shader
 from typing import TYPE_CHECKING, cast
+from mathutils import Matrix, Vector
 
 from sbstudio.model.types import Coordinate3D
 
@@ -31,9 +33,9 @@ PyroOverlayInfo = tuple[Coordinate3D, list[str]]
 a single coordinate and a list of text strings (one per line).
 """
 
-PyroOverlayMarker = tuple[Coordinate3D, Color]
+PyroOverlayMarker = tuple[Coordinate3D, Color, float, float, float]
 """Type specification for a single marker on the overlay. A marker requires 
-a single coordinate and a Color.
+a single coordinate, a Color, and yaw/pitch/roll angles in degrees.
 """
 
 DEFAULT_PYRO_OVERLAY_MARKER_COLOR: Color = (0.5, 0.5, 0.5)
@@ -79,10 +81,13 @@ class PyroOverlay(ShaderOverlay):
     def markers(self, value: list[PyroOverlayMarker] | None):
         if value is not None:
             self._markers = []
-            for point, color in value:
+            for point, color, yaw, pitch, roll in value:
                 marker = (
                     tuple(float(c) for c in point),
                     tuple(float(c) for c in color),
+                    float(yaw),
+                    float(pitch),
+                    float(roll),
                 )
                 self._markers.append(marker)  # type: ignore
 
@@ -170,13 +175,109 @@ class PyroOverlay(ShaderOverlay):
         points: list[Coordinate3D] = []
         colors: list[tuple[float, ...]] = []
 
-        for point, color in self._markers or ():
-            points.append(point)
-            colors.append(color)
+        # Define fixed colors for arrows
+        firing_color = (1.0, 0.0, 0.0)  # Red for firing direction
+        roll_color = (1.0, 1.0, 1.0)    # White for roll representation
 
-        # Construct the shader batch to draw the lines on the UI
+        # For each marker, draw two arrows: one for firing direction, one for roll
+        for marker_data in self._markers or ():
+            point, color, yaw, pitch, roll = marker_data
+            x, y, z = point
+            
+            # Convert angles from degrees to radians
+            yaw_rad = math.radians(yaw)
+            pitch_rad = math.radians(pitch)
+            roll_rad = math.radians(roll)
+            
+            # Arrow 1: Firing direction (forward direction) - RED
+            # Yaw and pitch determine firing direction
+            shaft_length = 2.5
+            arrow1_forward = Vector((0, 0, shaft_length))
+            arrow1_head_size = 0.5
+            arrow1_head_point = Vector((0, 0, shaft_length))
+            arrow1_head_left = Vector((0.25, 0, shaft_length - arrow1_head_size))
+            arrow1_head_right = Vector((-0.25, 0, shaft_length - arrow1_head_size))
+            
+            # Apply yaw and pitch only for firing direction (no roll)
+            # Using same order as original: pitch (Y) -> yaw (Z, negated)
+            rot_pitch = Matrix.Rotation(pitch_rad, 4, 'Y')
+            rot_yaw = Matrix.Rotation(-yaw_rad, 4, 'Z')
+            rot_matrix_firing = rot_yaw @ rot_pitch
+            
+            # Apply rotation
+            arrow1_forward = rot_matrix_firing @ arrow1_forward
+            arrow1_head_point = rot_matrix_firing @ arrow1_head_point
+            arrow1_head_left = rot_matrix_firing @ arrow1_head_left
+            arrow1_head_right = rot_matrix_firing @ arrow1_head_right
+            
+            # Arrow 1 shaft
+            points.append(tuple(point))
+            points.append(tuple(Vector(point) + arrow1_forward))
+            colors.append(firing_color)
+            colors.append(firing_color)
+            
+            # Arrow 1 head
+            arrow1_back = Vector(point) + arrow1_forward * (1 - arrow1_head_size / shaft_length)
+            points.append(tuple(arrow1_back))
+            points.append(tuple(Vector(point) + arrow1_head_left))
+            colors.append(firing_color)
+            colors.append(firing_color)
+            
+            points.append(tuple(arrow1_back))
+            points.append(tuple(Vector(point) + arrow1_head_right))
+            colors.append(firing_color)
+            colors.append(firing_color)
+            
+            points.append(tuple(Vector(point) + arrow1_head_left))
+            points.append(tuple(Vector(point) + arrow1_head_right))
+            colors.append(firing_color)
+            colors.append(firing_color)
+            
+            # Arrow 2: Roll direction (shows Z-axis rotation) - WHITE
+            arrow2_forward = Vector((shaft_length, 0, 0))  # Start pointing along X-axis
+            arrow2_head_size = 0.5
+            arrow2_head_point = Vector((shaft_length, 0, 0))
+            arrow2_head_left = Vector((shaft_length - arrow2_head_size, 0.25, 0))
+            arrow2_head_right = Vector((shaft_length - arrow2_head_size, -0.25, 0))
+            
+            # Apply rotations in the same order as the original code:
+            # roll (Z) -> pitch (Y) -> yaw (Z, negated)
+            rot_roll = Matrix.Rotation(roll_rad, 4, 'Z')
+            rot_pitch = Matrix.Rotation(pitch_rad, 4, 'Y')
+            rot_yaw = Matrix.Rotation(-yaw_rad, 4, 'Z')
+            rot_matrix_roll = rot_yaw @ rot_pitch @ rot_roll
+            
+            arrow2_forward = rot_matrix_roll @ arrow2_forward
+            arrow2_head_point = rot_matrix_roll @ arrow2_head_point
+            arrow2_head_left = rot_matrix_roll @ arrow2_head_left
+            arrow2_head_right = rot_matrix_roll @ arrow2_head_right
+            
+            # Arrow 2 shaft
+            points.append(tuple(point))
+            points.append(tuple(Vector(point) + arrow2_forward))
+            colors.append(roll_color)
+            colors.append(roll_color)
+            
+            # Arrow 2 head
+            arrow2_back = Vector(point) + arrow2_forward * (1 - arrow2_head_size / shaft_length)
+            points.append(tuple(arrow2_back))
+            points.append(tuple(Vector(point) + arrow2_head_left))
+            colors.append(roll_color)
+            colors.append(roll_color)
+            
+            points.append(tuple(arrow2_back))
+            points.append(tuple(Vector(point) + arrow2_head_right))
+            colors.append(roll_color)
+            colors.append(roll_color)
+            
+            points.append(tuple(Vector(point) + arrow2_head_left))
+            points.append(tuple(Vector(point) + arrow2_head_right))
+            colors.append(roll_color)
+            colors.append(roll_color)
+
+        # Construct the shader batch to draw the arrows
         batches: list[GPUBatch] = [
-            batch_for_shader(self._shader, "POINTS", {"pos": points, "color": colors}),
+            batch_for_shader(self._shader, "LINES", {"pos": points, "color": colors}),
         ]
 
         return batches
