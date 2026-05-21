@@ -2,13 +2,28 @@ from bpy.props import EnumProperty, FloatProperty, IntProperty, StringProperty
 from bpy.types import Operator
 
 from sbstudio.plugin.props.color import ColorProperty
-from sbstudio.plugin.model.pyro_options import PYRO_CHANNEL_OPTIONS
 from sbstudio.model.pyro_markers import PyroMarker, PyroPayload
 from sbstudio.plugin.selection import get_selected_drones
 from sbstudio.plugin.utils.pyro_markers import add_pyro_marker_to_object, get_pyro_markers_of_object
 from sbstudio.plugin.constants import Collections
 
 __all__ = ("TriggerPyroOnSelectedDronesOperator",)
+
+
+def _get_channel_items_for_operator(self, context):
+    """Callback for operator channel EnumProperty - returns custom channels from scene."""
+    if context and hasattr(context, 'scene'):
+        scene = context.scene
+        if scene and hasattr(scene, 'skybrush'):
+            pyro_control = scene.skybrush.pyro_control
+            if pyro_control and hasattr(pyro_control, 'custom_channels'):
+                items = []
+                for channel in pyro_control.custom_channels:
+                    items.append((str(channel.channel_index), channel.effect_name, channel.description or ""))
+                if items:
+                    return items
+    # Fallback: return all 256 channels
+    return [(str(i), str(i), "") for i in range(256)]
 
 
 class TriggerPyroOnSelectedDronesOperator(Operator):
@@ -26,8 +41,8 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
     channel = EnumProperty(
         name="Channel",
         description="The pyro channel and effect type",
-        items=PYRO_CHANNEL_OPTIONS,
-        default="1",
+        items=_get_channel_items_for_operator,
+        default=1,
     )
 
     name = StringProperty(

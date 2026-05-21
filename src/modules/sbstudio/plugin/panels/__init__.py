@@ -3,6 +3,7 @@ from .formations import FormationsPanel
 from .led_control import LEDControlPanel
 from .light_effects import LightEffectsPanel
 from .object_props import DroneShowAddonObjectPropertiesPanel
+from .pyro_channels_config import PyroChannelsConfigPanel
 from .pyro_control import PyroControlPanel
 from .safety_check import SafetyCheckPanel
 from .show import ShowPanel
@@ -19,6 +20,7 @@ __all__ = (
     "FormationsPanel",
     "LEDControlPanel",
     "LightEffectsPanel",
+    "PyroChannelsConfigPanel",
     "PyroControlPanel",
     "SafetyCheckPanel",
     "ShowPanel",

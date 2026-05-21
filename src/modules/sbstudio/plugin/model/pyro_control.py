@@ -1,4 +1,4 @@
-from bpy.props import EnumProperty, FloatProperty, IntProperty, StringProperty, BoolProperty
+from bpy.props import EnumProperty, FloatProperty, IntProperty, StringProperty, BoolProperty, CollectionProperty
 from bpy.types import Context, PropertyGroup
 
 from typing import overload
@@ -6,14 +6,35 @@ from typing import overload
 from sbstudio.plugin.constants import Collections
 from sbstudio.plugin.props.color import ColorProperty
 from sbstudio.plugin.utils.pyro_markers import update_pyro_particles_of_object
-from sbstudio.plugin.model.pyro_options import PYRO_CHANNEL_OPTIONS
 from sbstudio.plugin.overlays.pyro import (
     PyroOverlay,
     PyroOverlayInfo,
     PyroOverlayMarker,
 )
 
-__all__ = ("PyroControlPanelProperties",)
+__all__ = ("PyroChannelOption", "PyroControlPanelProperties", "get_default_pyro_channel_options")
+
+
+def _get_channel_enum_items(self, context):
+    """Callback for channel EnumProperty - returns custom channels from scene."""
+    if context and hasattr(context, 'scene'):
+        scene = context.scene
+        if scene and hasattr(scene, 'skybrush'):
+            pyro_control = scene.skybrush.pyro_control
+            if pyro_control and hasattr(pyro_control, 'custom_channels'):
+                items = []
+                for channel in pyro_control.custom_channels:
+                    items.append((str(channel.channel_index), channel.effect_name, channel.description or ""))
+                if items:
+                    return items
+    # Fallback: return all 256 channels
+    return [(str(i), str(i), "") for i in range(256)]
+
+
+def get_default_pyro_channel_options():
+    """Return the default pyro channel options."""
+    return []
+
 
 #: Global pyro marker overlay. This cannot be an attribute of PyroControlPanelProperties
 #: for some reason; Blender PropertyGroup objects are weird.
@@ -50,6 +71,62 @@ def visualization_updated(
         update_pyro_particles_of_object(drone)
 
 
+class PyroChannelOption(PropertyGroup):
+    """PropertyGroup for custom pyro channel options."""
+    
+    channel_index: IntProperty(
+        name="Channel Index",
+        description="The channel index (0-255)",
+        min=0,
+        max=255,
+        default=0
+    )
+    
+    effect_name: StringProperty(
+        name="Effect Name",
+        description="The name of the pyro effect",
+        default="Custom Effect"
+    )
+    
+    description: StringProperty(
+        name="Description",
+        description="Additional description of the effect",
+        default=""
+    )
+
+
+def get_pyro_channel_options():
+    """Get the combined list of static and custom pyro channel options."""
+    import bpy
+    
+    options = list(get_default_pyro_channel_options())
+    
+    # Add custom channels if available
+    try:
+        scene = bpy.context.scene
+        if scene and hasattr(scene, 'skybrush'):
+            pyro_control = scene.skybrush.pyro_control
+            if pyro_control and hasattr(pyro_control, 'custom_channels'):
+                for channel in pyro_control.custom_channels:
+                    index_str = str(channel.channel_index)
+                    # Replace the default option if it exists and has no custom name
+                    replaced = False
+                    for i, (value, name, desc) in enumerate(options):
+                        if value == index_str and name == index_str:
+                            # Replace the generic entry with the custom one
+                            options[i] = (index_str, channel.effect_name, channel.description or "")
+                            replaced = True
+                            break
+                    if not replaced and 0 <= channel.channel_index < 256:
+                        # Add new custom channel if not already in the list
+                        options.append((index_str, channel.effect_name, channel.description or ""))
+    except (AttributeError, TypeError):
+        # Context not available or scene doesn't have skybrush
+        pass
+    
+    return options
+
+
 class PyroControlPanelProperties(PropertyGroup):
     visualization = EnumProperty(
         items=[
@@ -67,8 +144,8 @@ class PyroControlPanelProperties(PropertyGroup):
     channel = EnumProperty(
         name="Channel",
         description="The pyro channel and effect type",
-        items=PYRO_CHANNEL_OPTIONS,
-        default="1",
+        items=_get_channel_enum_items,
+        default=1,
     )
 
     # pyro payload properties
@@ -148,6 +225,27 @@ class PyroControlPanelProperties(PropertyGroup):
         description="Show all pyro effects fired on the current frame",
         default=True,
     )
+
+    custom_channels: CollectionProperty(
+        name="Custom Channels",
+        description="Custom pyro channel configurations",
+        type=PyroChannelOption,
+    )
+
+    custom_channels_index: IntProperty(
+        name="Custom Channels Index",
+        description="Index of the active custom channel",
+        default=0,
+        min=0,
+    )
+
+    def get_current_channel_custom_info(self) -> PyroChannelOption | None:
+        """Get the custom channel info for the currently selected channel, if it exists."""
+        channel_idx = int(self.channel)
+        for custom_channel in self.custom_channels:
+            if custom_channel.channel_index == channel_idx:
+                return custom_channel
+        return None
 
     def clear_pyro_overlay_markers(self) -> None:
         """Clears the pyro overlay markers."""

@@ -7,12 +7,12 @@ from sbstudio.plugin.operators import (
     CalculatePyroMarkers as CalculatePyroMarkers,
 )
 from sbstudio.plugin.utils.pyro_markers import get_pyro_markers_of_object
-from sbstudio.plugin.model.pyro_options import PYRO_CHANNEL_OPTIONS
+from sbstudio.plugin.model.pyro_control import get_default_pyro_channel_options
 
 
 def get_channel_name(channel_index: str) -> str:
     """Get the display name for a pyro channel."""
-    for value, name, _ in PYRO_CHANNEL_OPTIONS:
+    for value, name, _ in get_default_pyro_channel_options():
         if value == channel_index:
             return name
     return f"Channel {channel_index}"

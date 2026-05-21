@@ -45,6 +45,7 @@ for candidate in candidates:
 from sbstudio.i18n.translations import translations_dict
 from sbstudio.plugin.lists import (
     SKYBRUSH_UL_lightfxlist,
+    SKYBRUSH_UL_pyro_channels,
     SKYBRUSH_UL_scheduleoverridelist,
 )
 from sbstudio.plugin.menus import GenerateMarkersMenu
@@ -58,6 +59,7 @@ from sbstudio.plugin.model import (
     LightEffect,
     LightEffectCollection,
     ColorFunctionProperties,
+    PyroChannelOption,
     PyroControlPanelProperties,
     SafetyCheckProperties,
     ScheduleOverride,
@@ -73,6 +75,7 @@ from sbstudio.plugin.operators import (
     AddMarkersFromSVGOperator,
     AddMarkersFromZippedCSVOperator,
     AddMarkersFromZippedDSSOperator,
+    AddPyroChannelOperator,
     AppendFormationToStoryboardOperator,
     ApplyColorsToSelectedDronesOperator,
     CreateFormationOperator,
@@ -105,6 +108,7 @@ from sbstudio.plugin.operators import (
     RefreshFileFormatsOperator,
     RemoveFormationOperator,
     RemoveLightEffectOperator,
+    RemovePyroChannelOperator,
     RemoveScheduleOverrideEntryOperator,
     RemoveStoryboardEntryOperator,
     ReorderFormationMarkersOperator,
@@ -144,6 +148,7 @@ from sbstudio.plugin.panels import (
     StoryboardEditor,
     LEDControlPanel,
     LightEffectsPanel,
+    PyroChannelsConfigPanel,
     PyroControlPanel,
     SafetyCheckPanel,
     ShowPanel,
@@ -191,6 +196,7 @@ types = (
     LightEffect,
     LightEffectCollection,
     LEDControlPanelProperties,
+    PyroChannelOption,
     PyroControlPanelProperties,
     SafetyCheckProperties,
     DroneShowAddonFileSpecificSettings,
@@ -266,13 +272,15 @@ operators = (
     AddMarkersFromZippedCSVOperator,
     AddMarkersFromZippedDSSOperator,
     AddMarkersFromQRCodeOperator,
+    AddPyroChannelOperator,
+    RemovePyroChannelOperator,
     RefreshFileFormatsOperator,
     RunFullProximityCheckOperator,
     UseSharedMaterialForAllDronesMigrationOperator,
 )
 
 #: List widgets in this addon.
-lists = (SKYBRUSH_UL_lightfxlist, SKYBRUSH_UL_scheduleoverridelist)
+lists = (SKYBRUSH_UL_lightfxlist, SKYBRUSH_UL_pyro_channels, SKYBRUSH_UL_scheduleoverridelist)
 
 #: Menus in this addon
 menus = (GenerateMarkersMenu,)
@@ -289,6 +297,7 @@ panels = (
     LEDControlPanel,
     LightEffectsPanel,
     PyroControlPanel,
+    PyroChannelsConfigPanel,
     SafetyCheckPanel,
     ExportPanel,
     DroneShowAddonObjectPropertiesPanel,

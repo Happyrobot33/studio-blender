@@ -42,6 +42,10 @@ from .move_storyboard_entry import (
     MoveStoryboardEntryUpOperator,
 )
 from .prepare import PrepareSceneOperator
+from .pyro_channel_management import (
+    AddPyroChannelOperator,
+    RemovePyroChannelOperator,
+)
 from .recalculate_transitions import RecalculateTransitionsOperator
 from .refresh_file_formats import RefreshFileFormatsOperator
 from .remove_formation import RemoveFormationOperator
@@ -81,8 +85,10 @@ __all__ = (
     "AddMarkersFromSVGOperator",
     "AddMarkersFromZippedCSVOperator",
     "AddMarkersFromZippedDSSOperator",
+    "AddPyroChannelOperator",
     "AppendFormationToStoryboardOperator",
     "ApplyColorsToSelectedDronesOperator",
+    "CalculatePyroMarkers",
     "CreateFormationOperator",
     "CreateLightEffectOperator",
     "CreateNewScheduleOverrideEntryOperator",
@@ -108,10 +114,15 @@ __all__ = (
     "MoveStoryboardEntryDownOperator",
     "MoveStoryboardEntryUpOperator",
     "PrepareSceneOperator",
+    "PYRO_OT_add_drone_to_selection",
+    "PYRO_OT_load_effect",
+    "PYRO_OT_select_drone",
     "RecalculateTransitionsOperator",
     "RefreshFileFormatsOperator",
     "RemoveFormationOperator",
     "RemoveLightEffectOperator",
+    "RemovePyroChannelOperator",
+    "RemovePyroOnSelectedDronesOperator",
     "RemoveScheduleOverrideEntryOperator",
     "RemoveStoryboardEntryOperator",
     "ReorderFormationMarkersOperator",
@@ -121,9 +132,9 @@ __all__ = (
     "SelectStoryboardEntryForCurrentFrameOperator",
     "SetLightEffectEndFrameOperator",
     "SetLightEffectStartFrameOperator",
+    "SetServerURLOperator",
     "SetStoryboardEntryEndFrameOperator",
     "SetStoryboardEntryStartFrameOperator",
-    "SetServerURLOperator",
     "SkybrushCSVExportOperator",
     "SkybrushExportOperator",
     "SkybrushPDFExportOperator",
@@ -131,11 +142,6 @@ __all__ = (
     "SwapColorsInLEDControlPanelOperator",
     "TakeoffOperator",
     "TriggerPyroOnSelectedDronesOperator",
-    "RemovePyroOnSelectedDronesOperator",
-    "CalculatePyroMarkers",
-    "PYRO_OT_load_effect",
-    "PYRO_OT_select_drone",
-    "PYRO_OT_add_drone_to_selection",
     "UpdateFormationOperator",
     "UpdateFrameRangeFromStoryboardOperator",
     "UpdateTimeMarkersFromStoryboardOperator",
