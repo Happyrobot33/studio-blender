@@ -6,7 +6,7 @@ import bpy
 from collections.abc import Callable, Iterable, Sequence
 from functools import partial
 from operator import itemgetter
-from typing import Any, cast, Optional
+from typing import Any, cast, Optional, TYPE_CHECKING
 from uuid import uuid4
 
 from bpy.path import abspath
@@ -47,6 +47,9 @@ from sbstudio.plugin.utils.evaluator import get_position_of_object
 from sbstudio.plugin.utils.image import convert_from_srgb_to_linear
 from sbstudio.plugin.utils.texture import texture_as_dict, update_texture_from_dict
 from sbstudio.utils import constant, distance_sq_of, load_module, negate
+
+if TYPE_CHECKING:
+    from sbstudio.plugin.overlays.light_effects import LightEffectsOverlay
 
 from .mixins import ListMixin
 
@@ -1322,3 +1325,25 @@ class LightEffectCollection(PropertyGroup, ListMixin):
     def update_from_storyboard(self, context: Context) -> None:
         for entry in self.entries:
             entry.update_from_storyboard(context, reset_offset=False)
+
+
+#: Current light effects overlay object
+_overlay: Optional[LightEffectsOverlay] = None
+
+
+def get_overlay(create: bool = True) -> Optional[LightEffectsOverlay]:
+    """Get or create the light effects overlay.
+    
+    Args:
+        create: whether to create the overlay if it doesn't exist
+        
+    Returns:
+        the light effects overlay, or None if create=False and it doesn't exist
+    """
+    global _overlay
+
+    if _overlay is None and create:
+        from sbstudio.plugin.overlays.light_effects import LightEffectsOverlay
+        _overlay = LightEffectsOverlay()
+
+    return _overlay

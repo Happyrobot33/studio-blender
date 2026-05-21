@@ -12,7 +12,8 @@ from .base import Task
 
 from sbstudio.model.types import MutableRGBAColor, RGBAColor
 from sbstudio.plugin.constants import Collections
-from sbstudio.plugin.colors import get_color_of_drone, set_color_of_drone
+from sbstudio.plugin.colors import get_color_of_drone
+from sbstudio.plugin.model.light_effects import get_overlay as get_light_effects_overlay
 from sbstudio.plugin.utils.evaluator import get_position_of_object
 
 if TYPE_CHECKING:
@@ -45,10 +46,6 @@ drone.
 def update_light_effects(scene: Scene, depsgraph: Depsgraph):
     global _last_frame, _base_color_cache, _suspension_counter, WHITE
 
-    print("UPDATING LIGHT EFFECTS")
-
-    
-
     # This function is going to be evaluated in every frame, so we should walk
     # the extra mile to ensure that the number of object allocations is as low
     # as possible -- therefore there are lots of in-place modifications of
@@ -65,6 +62,10 @@ def update_light_effects(scene: Scene, depsgraph: Depsgraph):
 
     frame = scene.frame_current
     drones = None
+    colors = None
+    positions = None
+    mapping = None
+    overlay_markers: list = []
 
     if _last_frame != frame:
         # Frame changed, clear the base color cache
@@ -82,19 +83,22 @@ def update_light_effects(scene: Scene, depsgraph: Depsgraph):
             if not _base_color_cache:
                 # This is the first time we are evaluating this frame, so fill
                 # the base color cache in parallel to the colors list
-                colors: list[MutableRGBAColor] = []
+                colors = []
                 for drone in drones:
                     color = list(get_color_of_drone(drone))
                     colors.append(color)
-                    _base_color_cache[id(drone)] = color
+                    _base_color_cache[id(drone)] = tuple(color)  # type: ignore
             else:
                 # Initialize the colors list from the cached base colors
                 colors = [
-                    _base_color_cache.get(id(drone)) or list(WHITE) for drone in drones
+                    list(_base_color_cache.get(id(drone)) or WHITE) for drone in drones
                 ]
 
             changed = True
 
+        assert colors is not None
+        assert positions is not None
+        assert mapping is not None
         effect.apply_on_colors(
             colors,
             positions=positions,
@@ -112,15 +116,24 @@ def update_light_effects(scene: Scene, depsgraph: Depsgraph):
         if _base_color_cache:
             drones = Collections.find_drones().objects
             colors = [
-                _base_color_cache.get(id(drone)) or list(WHITE) for drone in drones
+                list(_base_color_cache.get(id(drone)) or WHITE) for drone in drones
             ]
             _base_color_cache.clear()
             changed = True
 
-    if changed:
-        assert drones is not None
+    if changed and drones is not None and colors is not None:
+        # Build overlay markers instead of setting drone colors directly
         for drone, color in zip(drones, colors):
-            set_color_of_drone(drone, color)
+            position = get_position_of_object(drone)
+            overlay_markers.append((position, tuple(color)))
+
+    # Update the light effects overlay with the computed colors
+    # Create overlay if we have markers to display, otherwise just get it if it exists
+    overlay = get_light_effects_overlay(create=bool(overlay_markers))
+    if overlay is not None:
+        overlay.markers = overlay_markers if overlay_markers else None
+        # Enable overlay when there are markers to display
+        overlay.enabled = bool(overlay_markers)
 
 
 @contextmanager
