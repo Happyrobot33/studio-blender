@@ -67,6 +67,8 @@ from .takeoff import TakeoffOperator
 from .trigger_pyro import TriggerPyroOnSelectedDronesOperator
 from .remove_pyro import RemovePyroOnSelectedDronesOperator
 from .calculate_pyro_markers import CalculatePyroMarkers
+from .load_pyro_effect import PYRO_OT_load_effect
+from .select_drone import PYRO_OT_select_drone, PYRO_OT_add_drone_to_selection
 from .update_formation import UpdateFormationOperator
 from .update_time_markers_from_storyboard import UpdateTimeMarkersFromStoryboardOperator
 from .update_frame_range_from_storyboard import UpdateFrameRangeFromStoryboardOperator
@@ -131,6 +133,9 @@ __all__ = (
     "TriggerPyroOnSelectedDronesOperator",
     "RemovePyroOnSelectedDronesOperator",
     "CalculatePyroMarkers",
+    "PYRO_OT_load_effect",
+    "PYRO_OT_select_drone",
+    "PYRO_OT_add_drone_to_selection",
     "UpdateFormationOperator",
     "UpdateFrameRangeFromStoryboardOperator",
     "UpdateTimeMarkersFromStoryboardOperator",

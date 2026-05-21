@@ -1,4 +1,4 @@
-from bpy.props import EnumProperty, FloatProperty, IntProperty, StringProperty
+from bpy.props import EnumProperty, FloatProperty, IntProperty, StringProperty, BoolProperty
 from bpy.types import Context, PropertyGroup
 
 from typing import overload
@@ -141,6 +141,12 @@ class PyroControlPanelProperties(PropertyGroup):
         min=0.0,
         max=1.0,
         step=10  # button step is 1/10th of step
+    )
+
+    show_frame_effects = BoolProperty(
+        name="Show Frame Effects",
+        description="Show all pyro effects fired on the current frame",
+        default=True,
     )
 
     def clear_pyro_overlay_markers(self) -> None:
