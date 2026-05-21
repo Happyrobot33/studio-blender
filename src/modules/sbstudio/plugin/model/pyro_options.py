@@ -4,7 +4,7 @@ __all__ = ("PYRO_CHANNEL_OPTIONS",)
 
 #: Discrete pyro channel options with effect names and indices
 PYRO_CHANNEL_OPTIONS = [
-    ("0", "None", ""),
+    ("0", "None (kills all persistent)", ""),
     ("1", "Willow", ""),
     ("2", "Peony", ""),
     ("3", "Giant Peony", ""),
@@ -20,8 +20,8 @@ PYRO_CHANNEL_OPTIONS = [
     ("13", "Tourbillions", ""),
     ("14", "Swarm", ""),
     ("15", "Comet Slice", ""),
-    ("16", "Sparks", ""),
-    ("17", "Flames", ""),
+    ("16", "Sparks (persistent)", ""),
+    ("17", "Flames (persistent)", ""),
     ("18", "18", ""),
     ("19", "19", ""),
     ("20", "20", ""),
