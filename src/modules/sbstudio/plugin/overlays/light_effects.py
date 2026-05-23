@@ -60,7 +60,10 @@ class LightEffectsOverlay(ShaderOverlay):
         points: list[tuple[float, float, float]] = []
         colors: list[tuple[float, float, float, float]] = []
 
-        for position, color in self._markers:
+        # Sort markers by z-coordinate in descending order (back to front)
+        sorted_markers = sorted(self._markers, key=lambda m: m[0][2], reverse=False)
+
+        for position, color in sorted_markers:
             points.append(tuple(position))
             colors.append(color)
 
