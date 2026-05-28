@@ -54,7 +54,6 @@ class PyroControlPanel(Panel):
 
         layout.prop(pyro_control, "name")
         layout.prop(pyro_control, "duration")
-        layout.prop(pyro_control, "prefire_time")
 
         layout.separator()
 

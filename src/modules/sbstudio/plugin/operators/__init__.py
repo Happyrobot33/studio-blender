@@ -45,6 +45,7 @@ from .prepare import PrepareSceneOperator
 from .pyro_channel_management import (
     AddPyroChannelOperator,
     RemovePyroChannelOperator,
+    UpdatePyroChannelMarkersOperator,
 )
 from .recalculate_transitions import RecalculateTransitionsOperator
 from .refresh_file_formats import RefreshFileFormatsOperator
@@ -144,6 +145,7 @@ __all__ = (
     "TriggerPyroOnSelectedDronesOperator",
     "UpdateFormationOperator",
     "UpdateFrameRangeFromStoryboardOperator",
+    "UpdatePyroChannelMarkersOperator",
     "UpdateTimeMarkersFromStoryboardOperator",
     "UseSelectedVertexGroupForFormationOperator",
     "UseSharedMaterialForAllDronesMigrationOperator",

@@ -48,7 +48,12 @@ class PYRO_OT_load_effect(Operator):
         pyro_control.channel = str(marker.channel)
         pyro_control.name = marker.payload.name
         pyro_control.duration = marker.payload.duration
-        pyro_control.prefire_time = marker.payload.prefire_time
+        
+        # Load prefire_time into the channel's custom info if available
+        custom_channel = pyro_control.get_current_channel_custom_info()
+        if custom_channel:
+            custom_channel.prefire_time = marker.payload.prefire_time
+        
         pyro_control.pitch = marker.pitch
         pyro_control.yaw = marker.yaw
         pyro_control.roll = marker.roll

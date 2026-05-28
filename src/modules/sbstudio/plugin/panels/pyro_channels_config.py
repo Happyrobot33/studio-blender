@@ -63,7 +63,15 @@ class PyroChannelsConfigPanel(Panel):
             if 0 <= pyro_control.custom_channels_index < len(pyro_control.custom_channels):
                 channel = pyro_control.custom_channels[pyro_control.custom_channels_index]
                 
-                layout.label(text="Channel Properties", icon="PROPERTIES")
-                layout.prop(channel, "channel_index", text="Channel Index")
-                layout.prop(channel, "effect_name", text="Effect Name")
-                layout.prop(channel, "description", text="Description")
+                if channel is not None:
+                    layout.label(text="Channel Properties", icon="PROPERTIES")
+                    layout.prop(channel, "channel_index", text="Channel Index")
+                    layout.prop(channel, "effect_name", text="Effect Name")
+                    layout.prop(channel, "description", text="Description")
+                    layout.prop(channel, "prefire_time", text="Prefire Time")
+                    
+                    layout.separator()
+                    
+                    # Button to update all markers using this channel
+                    update_op = layout.operator("skybrush.update_pyro_channel_markers", text="Update All Markers for This Channel", icon="FILE_REFRESH")
+                    update_op.channel_index = channel.channel_index

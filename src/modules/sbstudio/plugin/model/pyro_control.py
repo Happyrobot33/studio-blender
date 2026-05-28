@@ -93,6 +93,14 @@ class PyroChannelOption(PropertyGroup):
         description="Additional description of the effect",
         default=""
     )
+    
+    prefire_time: FloatProperty(
+        name="Prefire time",
+        description="The time needed for the pyro effect to show up after it gets triggered",
+        min=0,
+        unit="TIME",
+        step=100,  # button step is 1/100th of step
+    )
 
 
 def get_pyro_channel_options():
@@ -161,14 +169,6 @@ class PyroControlPanelProperties(PropertyGroup):
         description="The duration of the pyro effect",
         default=30,
         min=0.1,
-        unit="TIME",
-        step=100,  # button step is 1/100th of step
-    )
-
-    prefire_time = FloatProperty(
-        name="Prefire time",
-        description="The time needed for the pyro effect to show up after it gets triggered",
-        min=0,
         unit="TIME",
         step=100,  # button step is 1/100th of step
     )

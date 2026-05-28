@@ -48,6 +48,7 @@ class CalculatePyroMarkers(Operator):
                 markers.remove(m)
 
         drones = Collections.find_drones(create=False)
+        pyro_control = scene.skybrush.pyro_control
 
         for drone in drones.objects:
             markers = get_pyro_markers_of_object(drone)
@@ -60,4 +61,12 @@ class CalculatePyroMarkers(Operator):
                 primary_color = markers.markers[frame].primary_color
                 secondary_color = markers.markers[frame].secondary_color
                 volume = markers.markers[frame].volume
-                m = scene.timeline_markers.new(name=f"Pyro {channel} on {drone.name}, Pitch: {pitch}, Yaw: {yaw}, Roll: {roll}, Primary: {primary_color}, Secondary: {secondary_color}, Volume: {volume:.1f}, Prefire: {prefire}", frame=frame)
+                
+                # Get the channel name from custom channel info if available
+                channel_name = str(channel)
+                for custom_channel in pyro_control.custom_channels:
+                    if custom_channel.channel_index == channel:
+                        channel_name = custom_channel.effect_name
+                        break
+                
+                m = scene.timeline_markers.new(name=f"Pyro {channel_name} ({channel}) on {drone.name}, Pitch: {pitch}, Yaw: {yaw}, Roll: {roll}, Primary: {primary_color}, Secondary: {secondary_color}, Volume: {volume:.1f}, Prefire: {prefire}", frame=frame)

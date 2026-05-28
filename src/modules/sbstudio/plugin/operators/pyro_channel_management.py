@@ -7,6 +7,7 @@ from bpy.props import IntProperty
 __all__ = (
     "AddPyroChannelOperator",
     "RemovePyroChannelOperator",
+    "UpdatePyroChannelMarkersOperator",
 )
 
 
@@ -64,4 +65,57 @@ class RemovePyroChannelOperator(Operator):
             if pyro_control.custom_channels_index >= len(pyro_control.custom_channels):
                 pyro_control.custom_channels_index = max(0, len(pyro_control.custom_channels) - 1)
         
+        return {"FINISHED"}
+
+
+class UpdatePyroChannelMarkersOperator(Operator):
+    """Update all markers using a specific channel with the channel's current prefire time."""
+    
+    bl_idname = "skybrush.update_pyro_channel_markers"
+    bl_label = "Update Markers for Channel"
+    bl_description = "Update all markers using this channel with the channel's current prefire time"
+    
+    channel_index: IntProperty(
+        name="Channel Index",
+        description="Index of the channel to update markers for",
+        default=-1,
+    )
+    
+    def execute(self, context: Context):
+        pyro_control = context.scene.skybrush.pyro_control
+        
+        # Get the channel to update markers for
+        channel_index = self.channel_index
+        channel = None
+        for ch in pyro_control.custom_channels:
+            if ch.channel_index == channel_index:
+                channel = ch
+                break
+        
+        if not channel:
+            self.report({"ERROR"}, f"Channel {channel_index} not found")
+            return {"CANCELLED"}
+        
+        # Find all drones and update their markers
+        from sbstudio.plugin.constants import Collections
+        from sbstudio.plugin.utils.pyro_markers import get_pyro_markers_of_object, set_pyro_markers_of_object
+        
+        drones = Collections.find_drones(create=False)
+        if not drones:
+            self.report({"INFO"}, "No drones found")
+            return {"FINISHED"}
+        
+        markers_updated = 0
+        for drone in drones.objects:
+            markers = get_pyro_markers_of_object(drone)
+            for frame, marker in markers.markers.items():
+                if marker.channel == channel_index:
+                    # Update the prefire_time in the payload
+                    marker.payload.prefire_time = channel.prefire_time
+                    markers_updated += 1
+            
+            # Save the updated markers
+            set_pyro_markers_of_object(drone, markers)
+        
+        self.report({"INFO"}, f"Updated {markers_updated} markers for channel {channel_index} ({channel.effect_name})")
         return {"FINISHED"}

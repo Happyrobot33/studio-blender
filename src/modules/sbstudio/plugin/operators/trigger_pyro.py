@@ -123,7 +123,11 @@ class TriggerPyroOnSelectedDronesOperator(Operator):
         self.channel = pyro_control.channel
         self.name = pyro_control.name
         self.duration = pyro_control.duration
-        self.prefire_time = pyro_control.prefire_time
+        
+        # Get prefire_time from the channel's custom info if available
+        custom_channel = pyro_control.get_current_channel_custom_info()
+        self.prefire_time = custom_channel.prefire_time if custom_channel else 0
+        
         self.pitch = pyro_control.pitch
         self.yaw = pyro_control.yaw
         self.roll = pyro_control.roll
