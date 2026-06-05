@@ -1165,6 +1165,16 @@ class LightEffectCollection(PropertyGroup, ListMixin):
         description="Index of the light effect currently being edited",
     )
 
+    #: Point size for rendering light effect markers
+    point_size = FloatProperty(
+        name="Point Size",
+        description="Size of the rendered light effect marker points",
+        default=10.0,
+        min=1.0,
+        max=100.0,
+        options=set(),
+    )
+
     @property
     def active_entry(self) -> Optional[LightEffect]:
         """The active light effect entry currently selected for editing, or

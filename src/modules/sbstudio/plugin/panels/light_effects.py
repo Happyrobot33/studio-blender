@@ -47,12 +47,13 @@ class LightEffectsPanel(Panel):
         if not light_effects:
             return
         
-        # Add light effects toggle
+        # Add light effects toggle and size control
         light_effects = scene.skybrush.light_effects
         if light_effects:
             row = layout.row()
             row.use_property_split = False
             row.prop(light_effects, "enabled", text="Calculate Light Effects")
+            row.prop(light_effects, "point_size", text="Size")
 
         row = layout.row()
         row.operator(ImportLightEffectsOperator.bl_idname, text="Import...")

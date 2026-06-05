@@ -87,6 +87,11 @@ class LightEffectsOverlay(ShaderOverlay):
             self._shader_batches = self._create_shader_batches()
 
         if self._shader_batches:
+            import bpy
+            scene = bpy.context.scene
+            light_effects = scene.skybrush.light_effects
+            point_size = light_effects.point_size if light_effects else 10.0
+            gpu.state.point_size_set(point_size)
             self._shader.bind()
             for batch in self._shader_batches:
                 batch.draw(self._shader)
