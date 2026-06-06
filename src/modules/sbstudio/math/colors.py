@@ -15,6 +15,7 @@ class BlendMode(IntEnum):
     SOFT_LIGHT = auto()
     HARD_LIGHT = auto()
     ADDITIVE = auto()
+    SUBTRACTIVE = auto()
     HUESHIFT = auto()
 
     # Do not change the order of items above to remain compatible with already
@@ -116,6 +117,12 @@ def _blend_add(
     for i in range(3):
         backdrop[i] = min(a * (source[i] + backdrop[i]) + b * backdrop[i], 1.0)
 
+def _blend_subtract(
+    source: Sequence[float], backdrop: MutableSequence[float], a: float, b: float
+) -> None:
+    for i in range(3):
+        backdrop[i] = max(a * (backdrop[i] - source[i]) + b * backdrop[i], 0.0)
+
 def _blend_hueshift(
     source: Sequence[float], backdrop: MutableSequence[float], a: float, b: float
 ) -> None:
@@ -157,6 +164,7 @@ _blend_funcs: List[
     _blend_soft_light,
     _blend_hard_light,
     _blend_add,
+    _blend_subtract,
     _blend_hueshift,
 ]
 
