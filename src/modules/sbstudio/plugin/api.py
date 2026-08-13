@@ -139,8 +139,9 @@ def call_api_from_blender_operator(
     except OSError as ex:
         operator.report({"ERROR"}, f"{default_message}: {ex.strerror}")
         raise
-    except Exception:
-        operator.report({"ERROR"}, default_message)
+    except Exception as ex:
+        import traceback
+        operator.report({"ERROR"}, f"{default_message}: {ex}, {traceback.format_exc()}")
         raise
 
 
