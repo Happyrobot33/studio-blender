@@ -63,8 +63,10 @@ def object_has_mesh_data(self, obj) -> bool:
     """
     return obj.data and isinstance(obj.data, Mesh)
 
-
-CONTAINMENT_TEST_AXES = (Vector((1, 0, 0)), Vector((0, 1, 0)), Vector((0, 0, 1)), Vector((-1, 0, 0)), Vector((0, -1, 0)), Vector((0, 0, -1)))
+AXIS_LENGTH = 1
+CONTAINMENT_TEST_AXES = (Vector((AXIS_LENGTH, 0, 0)), Vector((0, AXIS_LENGTH, 0)), Vector((0, 0, AXIS_LENGTH)), Vector((-AXIS_LENGTH, 0, 0)), Vector((0, -AXIS_LENGTH, 0)), Vector((0, 0, -AXIS_LENGTH)))
+#rotate by 45 and add
+CONTAINMENT_TEST_AXES += (Vector((AXIS_LENGTH, AXIS_LENGTH, 0)).normalized(), Vector((AXIS_LENGTH, 0, AXIS_LENGTH)).normalized(), Vector((0, AXIS_LENGTH, AXIS_LENGTH)).normalized(), Vector((-AXIS_LENGTH, AXIS_LENGTH, 0)).normalized(), Vector((-AXIS_LENGTH, 0, AXIS_LENGTH)).normalized(), Vector((0, -AXIS_LENGTH, AXIS_LENGTH)).normalized(), Vector((AXIS_LENGTH, -AXIS_LENGTH, 0)).normalized(), Vector((AXIS_LENGTH, 0, -AXIS_LENGTH)).normalized(), Vector((0, AXIS_LENGTH, -AXIS_LENGTH)).normalized(), Vector((-AXIS_LENGTH, -AXIS_LENGTH, 0)).normalized(), Vector((-AXIS_LENGTH, 0, -AXIS_LENGTH)).normalized(), Vector((0, -AXIS_LENGTH, -AXIS_LENGTH)).normalized())
 """Pre-constructed vectors for a quick containment test using raycasting and BVH-trees"""
 
 OUTPUT_TYPE_TO_AXIS_SORT_KEY = {
