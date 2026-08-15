@@ -31,6 +31,7 @@ from bpy.types import (
 )
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+import math
 
 from sbstudio.math.colors import blend_in_place, BlendMode
 from sbstudio.math.rng import RandomSequence
@@ -97,6 +98,7 @@ OUTPUT_ITEMS = [
     ("GRADIENT_ZYX", "Gradient (ZYX)", "", 9),
     ("TEMPORAL", "Temporal", "", 10),
     ("DISTANCE", "Distance from mesh", "", 11),
+    ("RAW_DISTANCE", "Raw distance from mesh, 0 to 1 meters. Mesh scale scales the range", "", 14),
     ("CUSTOM", "Custom expression", "", 12),
 ]
 """Output types of light effects, determining the indexing
@@ -568,6 +570,19 @@ class LightEffect(PropertyGroup):
                         for u, v in enumerate(order):
                             outputs[v] = u / (num_positions - 1)
 
+            elif output_type == "RAW_DISTANCE":
+                if self.mesh:
+                    position_of_mesh = get_position_of_object(self.mesh)
+                    #take the direct meters distance from drone to mesh origin, multiplied up by the meshes scale
+                    #so a mesh at scale 1, when a drone is ontop of it, should produce x 0, and when its 1 meter away, it should produce x 1.0
+                    outputs = [
+                        math.sqrt(distance_sq_of(positions[index], position_of_mesh)) / self.mesh.scale[0]
+                        for index in range(num_positions)
+                    ]
+                    # outputs = [1.0] * num_positions  # type: ignore
+                    # outputs = [0.0] * num_positions  # type: ignore
+                else:
+                    outputs = [0.0] * num_positions  # type: ignore
             elif output_type == "INDEXED_BY_DRONES":
                 # Gradient based on drone index
                 if num_positions > 1:
