@@ -70,6 +70,11 @@ def get_position_of_object(object: Object) -> Coordinate3D:
     Returns:
         location of object in the world frame
     """
+    # print(object);
+    # print(f"Getting position of object: {object.name}")
+    if not hasattr(object, "matrix_world") or object.matrix_world is None:
+        print(f"Warning: Object {object} is None or has no matrix_world. Returning (0, 0, 0).")
+        return (0.0, 0.0, 0.0)
     return tuple(object.matrix_world.translation)  # pyright: ignore[reportReturnType]
 
 
