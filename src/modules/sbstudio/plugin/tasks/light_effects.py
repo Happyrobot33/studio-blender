@@ -61,6 +61,9 @@ def update_light_effects(scene: Scene, depsgraph: Depsgraph):
     random_seq = scene.skybrush.settings.random_sequence_root
 
     frame = scene.frame_current
+    if frame % light_effects.update_interval:
+        return
+
     drones = None
     colors = None
     positions = None

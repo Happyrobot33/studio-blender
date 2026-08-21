@@ -53,6 +53,7 @@ class LightEffectsPanel(Panel):
             row = layout.row()
             row.use_property_split = False
             row.prop(light_effects, "enabled", text="Calculate Light Effects")
+            row.prop(light_effects, "update_interval", text="Every")
             row.prop(light_effects, "point_size", text="Size")
 
         row = layout.row()

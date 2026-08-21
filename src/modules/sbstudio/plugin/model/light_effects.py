@@ -1173,6 +1173,15 @@ class LightEffectCollection(PropertyGroup, ListMixin):
         options=set(),
     )
 
+    #: Number of frames between light effect evaluations
+    update_interval = IntProperty(
+        name="Update Interval",
+        description="Calculate light effects every nth frame",
+        default=1,
+        min=1,
+        options=set(),
+    )
+
     #: The entries in the collection
     entries = CollectionProperty(type=LightEffect)
 
