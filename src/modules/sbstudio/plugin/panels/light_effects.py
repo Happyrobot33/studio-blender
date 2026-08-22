@@ -177,6 +177,8 @@ class LightEffectsPanel(Panel):
                 if entry.output == "CUSTOM":
                     col.prop(entry.output_function, "path", text="Fn file")
                     col.prop(entry.output_function, "name", text="Fn name")
+                if entry.output == "TEMPORAL":
+                    col.prop(entry, "output_temporal_repeat")
             if output_type_supports_mapping_mode(entry.output):
                 col.prop(entry, "output_mapping_mode")
             if entry.type == "IMAGE":
@@ -184,6 +186,8 @@ class LightEffectsPanel(Panel):
                 if entry.output_y == "CUSTOM":
                     col.prop(entry.output_function_y, "path", text="Fn file")
                     col.prop(entry.output_function_y, "name", text="Fn name")
+                if entry.output_y == "TEMPORAL":
+                    col.prop(entry, "output_temporal_repeat_y")
                 if output_type_supports_mapping_mode(entry.output_y):
                     col.prop(entry, "output_mapping_mode_y")
             col.prop(entry, "target")

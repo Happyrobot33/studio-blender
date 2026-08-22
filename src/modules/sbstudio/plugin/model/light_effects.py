@@ -370,6 +370,22 @@ class LightEffect(PropertyGroup):
         items=[("ORDERED", "Ordered", "", 1), ("PROPORTIONAL", "Proportional", "", 2)],
     )
 
+    output_temporal_repeat = IntProperty(
+        name="Repeat X",
+        description="Number of times the color ramp or image X axis is cycled through during the duration of the light effect when using the Temporal output",
+        min=1,
+        default=1,
+        options=set(),
+    )
+
+    output_temporal_repeat_y = IntProperty(
+        name="Repeat Y",
+        description="Number of times the image Y axis is cycled through during the duration of the light effect when using the Temporal output",
+        min=1,
+        default=1,
+        options=set(),
+    )
+
     influence = FloatProperty(
         name="Influence",
         description="Influence of this light effect on the final color of drones",
@@ -486,12 +502,16 @@ class LightEffect(PropertyGroup):
             output_type: str,
             mapping_mode: str,
             output_function,
+            temporal_repeat: int = 1,
         ) -> tuple[Optional[list[Optional[float]]], Optional[float]]:
             """Get the float output(s) for color ramp or image indexing based on the output type.
 
             Args:
                 output_type: the output type used for indexing
                 mapping_mode: mapping mode corresponding to the output type
+                temporal_repeat: number of times the color ramp or image axis
+                    should be cycled through during the duration of the light
+                    effect; only used by the ``TEMPORAL`` output type
 
             Returns:
                 individual and common outputs
@@ -505,7 +525,12 @@ class LightEffect(PropertyGroup):
             elif output_type == "LAST_COLOR":
                 common_output = 1.0
             elif output_type == "TEMPORAL":
-                common_output = time_fraction
+                repeated = (time_fraction * max(temporal_repeat, 1)) % 1.0
+                # keep the ramp/image ending exactly on 1.0 at cycle boundaries
+                # instead of wrapping back to 0.0
+                common_output = (
+                    1.0 if repeated == 0.0 and time_fraction > 0.0 else repeated
+                )
             elif output_type_supports_mapping_mode(output_type):
                 # There are two options here:
                 # 1. Legacy, non-proportional mode. We sort the drones based on the
@@ -660,11 +685,17 @@ class LightEffect(PropertyGroup):
         new_color = [0.0] * 4
 
         outputs_x, common_output_x = get_output_based_on_output_type(
-            self.output, self.output_mapping_mode, self.output_function
+            self.output,
+            self.output_mapping_mode,
+            self.output_function,
+            self.output_temporal_repeat,
         )
         if color_image is not None:
             outputs_y, common_output_y = get_output_based_on_output_type(
-                self.output_y, self.output_mapping_mode_y, self.output_function_y
+                self.output_y,
+                self.output_mapping_mode_y,
+                self.output_function_y,
+                self.output_temporal_repeat_y,
             )
 
         # Get the additional predicate required to evaluate whether the effect
@@ -774,6 +805,8 @@ class LightEffect(PropertyGroup):
             "randomness": self.randomness,
             "outputMappingMode": self.output_mapping_mode,
             "outputMappingModeY": self.output_mapping_mode_y,
+            "outputTemporalRepeat": self.output_temporal_repeat,
+            "outputTemporalRepeatY": self.output_temporal_repeat_y,
             "blendMode": self.blend_mode,
             "type": self.type,
             "invertTarget": self.invert_target,
@@ -934,6 +967,8 @@ class LightEffect(PropertyGroup):
         self.randomness = other.randomness
         self.output_mapping_mode = other.output_mapping_mode
         self.output_mapping_mode_y = other.output_mapping_mode_y
+        self.output_temporal_repeat = other.output_temporal_repeat
+        self.output_temporal_repeat_y = other.output_temporal_repeat_y
         self.blend_mode = other.blend_mode
         self.type = other.type
         self.color_image = other.color_image
@@ -992,6 +1027,10 @@ class LightEffect(PropertyGroup):
             self.output_mapping_mode = output_mapping_mode
         if output_mapping_mode_y := data.get("outputMappingModeY"):
             self.output_mapping_mode_y = output_mapping_mode_y
+        if output_temporal_repeat := data.get("outputTemporalRepeat"):
+            self.output_temporal_repeat = output_temporal_repeat
+        if output_temporal_repeat_y := data.get("outputTemporalRepeatY"):
+            self.output_temporal_repeat_y = output_temporal_repeat_y
         if blend_mode := data.get("blendMode"):
             self.blend_mode = blend_mode
         if effect_type := data.get("type"):
